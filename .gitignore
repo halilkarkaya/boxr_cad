@@ -69,4 +69,7 @@ coverage.xml
 *.obj
 *.stl
 # *.png 
-uygulama.log 
+uygulama.log
+
+# Environment files
+.env
