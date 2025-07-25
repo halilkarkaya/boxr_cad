@@ -68,4 +68,4 @@ coverage.xml
 # 3D/Model files
 *.obj
 *.stl
-*.png 
+# *.png 

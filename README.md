@@ -1,5 +1,7 @@
 # boxr_cad
 
+![Uygulama Ekran Görüntüsü](image.png)
+
 Bu proje, 3D CAD dosyalarını görüntülemek ve dönüştürmek için geliştirilmiştir.
 
 ## Özellikler
@@ -21,4 +23,4 @@ python main.py
 ```
 
 ## Katkı
-Katkıda bulunmak için lütfen bir fork oluşturun ve pull request gönderin. 
+Katkıda bulunmak için lütfen bir fork oluşturun ve pull request gönderin.
