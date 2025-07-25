@@ -69,3 +69,4 @@ coverage.xml
 *.obj
 *.stl
 # *.png 
+uygulama.log 

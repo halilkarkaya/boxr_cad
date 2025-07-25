@@ -154,12 +154,12 @@ class MainWindow(QWidget):
         left_frame.setStyleSheet("background-color: #232836; border-radius: 12px;")
 
         # --- SCROLLABLE PANEL ---
-        scroll_area = QScrollArea(left_frame)
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setFrameShape(QFrame.NoFrame)
-        scroll_area.setStyleSheet("background: transparent; border: none;")
-        scroll_content = QWidget()
-        vbox = QVBoxLayout(scroll_content)
+        self.scroll_area = QScrollArea(left_frame)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QFrame.NoFrame)
+        self.scroll_area.setStyleSheet("background: transparent; border: none;")
+        self.scroll_content = QWidget()
+        vbox = QVBoxLayout(self.scroll_content)
         vbox.setContentsMargins(16, 16, 16, 16)
         vbox.setSpacing(12)
         # --- digimode.png logo en üste ---
@@ -170,12 +170,14 @@ class MainWindow(QWidget):
         boxr_label.setAlignment(Qt.AlignCenter)
         boxr_label.setStyleSheet("color: #FFD600; letter-spacing: 3px; margin-bottom: 8px; margin-top: 8px;")
         vbox.addWidget(boxr_label)
+        self.left_panel_labels = [boxr_label]  # Açık tema için başlık ve label'ları sakla
         # Dosya işlemleri başlığı
         title = QLabel("Dosya İşlemleri")
         title.setFont(QFont("Arial", 12, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("color: #bfc7e6;")
         vbox.addWidget(title)
+        self.left_panel_labels.append(title)
         # Dosya işlemleri butonları
         btn_names = [
             ("➕ Katman Ekle", "➕ Katman Ekle"),
@@ -183,6 +185,7 @@ class MainWindow(QWidget):
         ]
 
         btn_widgets = {}
+        self.left_panel_buttons = []  # Açık tema için sol panel butonlarını sakla
         for text, name in btn_names:
             btn = QPushButton(text)
             btn.setStyleSheet("""
@@ -203,6 +206,7 @@ class MainWindow(QWidget):
             btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             vbox.addWidget(btn)
             btn_widgets[name] = btn  # Butonları sözlükte tut
+            self.left_panel_buttons.append(btn)
 
         # Dönüştürme alt butonları (başta gizli)
         self.convert_sub_buttons = []
@@ -284,6 +288,7 @@ class MainWindow(QWidget):
         model_info_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         vbox.addWidget(model_info_btn)
         model_info_btn.clicked.connect(self.show_model_info_in_panel)
+        self.left_panel_buttons.append(model_info_btn)
 
         # Hakkında butonu
         about_btn = QPushButton("❔ Hakkında")
@@ -305,63 +310,14 @@ class MainWindow(QWidget):
         about_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.about_btn_style = about_btn.styleSheet()
         vbox.addWidget(about_btn)
-        def show_about():
-            logging.info("Hakkında butonuna tıklandı")
-            html = self.logo_img_html
-            html += (
-                "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>"
-                "<p><b>Versiyon:</b> 1.0.0</p>"
-                "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>"
-                "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>"
-                "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>"
-                "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>"
-                "<li style='margin-bottom:2px;'>STL (.stl)</li>"
-                "<li style='margin-bottom:2px;'>FBX (.fbx)</li>"
-                "<li style='margin-bottom:2px;'>GLB (.glb)</li>"
-                "<li style='margin-bottom:2px;'>OBJ (.obj)</li>"
-                "</ul>"
-                "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>"
-                "</div>"
-            )
-            self.right_content_label.setText(html)
-            # Log indirme butonunu kaldır
-            if hasattr(self, 'log_download_btn') and self.log_download_btn is not None:
-                self.log_download_btn.setParent(None)
-                self.log_download_btn = None
-        about_btn.clicked.connect(show_about)
+        self.left_panel_buttons.append(about_btn)
 
         # --- YARDIM / SSS BUTONU ---
         help_btn = QPushButton("💡 Yardım / SSS")
         help_btn.setStyleSheet(about_btn.styleSheet())
         help_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         vbox.addWidget(help_btn)
-        def show_help():
-            logging.info("Yardım/SSS butonuna tıklandı")
-            html = self.logo_img_html
-            html += (
-                "<div style='font-family: Segoe UI; font-size: 15px; color:#FFD600; text-align:center;'><b>Yardım & Sıkça Sorulan Sorular (SSS)</b></div>"
-                "<div style='font-size:14px; color:#bfc7e6; text-align:left; margin-top:10px;'>"
-                "<b>1. Katman nasıl eklenir?</b><br>"
-                "Sol paneldeki '➕ Katman Ekle' butonuna tıklayın ve eklemek istediğiniz dosyayı seçin.<br><br>"
-                "<b>2. Dosya formatları arasında nasıl dönüştürme yapabilirim?</b><br>"
-                "'🔄 Dosya Dönüştür' butonuna tıklayın, ardından istediğiniz dönüştürme seçeneğini seçin.<br><br>"
-                "<b>3. Modeli nasıl döndürebilirim veya taşıyabilirim?</b><br>"
-                "Sağ paneldeki ok ve döndürme butonlarını kullanarak seçili katmanı hareket ettirebilir veya döndürebilirsiniz.<br><br>"
-                "<b>4. Ölçüm nasıl yapılır?</b><br>"
-                "'📏 Ölçüm Yap' butonuna tıklayın ve altındaki ölçüm türlerinden birini seçin. Ardından model üzerinde seçim yapın.<br><br>"
-                "<b>5. Renk veya arka plan nasıl değiştirilir?</b><br>"
-                "Sağ paneldeki '🎨 Renk Seç' veya '🖼️ Arka Plan Rengi' butonlarını kullanabilirsiniz.<br><br>"
-                "<b>6. Loglara nasıl ulaşabilirim?</b><br>"
-                "Sol paneldeki '📝 Loglar' butonuna tıklayarak uygulama loglarını görüntüleyebilir ve kaydedebilirsiniz.<br><br>"
-                "<b>7. Sık karşılaşılan sorunlar ve çözümleri</b><br>"
-                "- <b>Model yüklenmiyor:</b> Dosya formatının desteklendiğinden emin olun.<br>"
-                "- <b>Dönüştürme başarısız:</b> Dosyanın bozuk olmadığından ve yeterli disk alanı olduğundan emin olun.<br>"
-                "- <b>Arayüzde yazılar görünmüyor:</b> Ekran çözünürlüğünüzü ve ölçek ayarlarınızı kontrol edin.<br><br>"
-                "<b>Diğer sorularınız için:</b> Lütfen geliştirici ile iletişime geçin.<br>"
-                "</div>"
-            )
-            self.right_content_label.setText(html)
-        help_btn.clicked.connect(show_help)
+        self.left_panel_buttons.append(help_btn)
 
         # Mesafe Ölç butonunu kaldır, yerine Ölçüm Yap ve altına yeni butonlar ekle
         # Eski mesafe_btn ve ilgili kodlar kaldırıldı
@@ -393,18 +349,21 @@ class MainWindow(QWidget):
         self.kenar_olc_btn.setVisible(False)
         vbox.insertWidget(vbox.indexOf(self.olcum_btn)+1, self.kenar_olc_btn)
         self.olcum_sub_buttons.append(self.kenar_olc_btn)
+        self.left_panel_buttons.append(self.kenar_olc_btn)
         self.vertex_olc_btn = QPushButton("🟡 Vertex Ölç")
         self.vertex_olc_btn.setStyleSheet(olcum_sub_btn_style)
         self.vertex_olc_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.vertex_olc_btn.setVisible(False)
         vbox.insertWidget(vbox.indexOf(self.kenar_olc_btn)+1, self.vertex_olc_btn)
         self.olcum_sub_buttons.append(self.vertex_olc_btn)
+        self.left_panel_buttons.append(self.vertex_olc_btn)
         self.alan_olc_btn = QPushButton("🟦 Alan Ölç")
         self.alan_olc_btn.setStyleSheet(olcum_sub_btn_style)
         self.alan_olc_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.alan_olc_btn.setVisible(False)
         vbox.insertWidget(vbox.indexOf(self.vertex_olc_btn)+1, self.alan_olc_btn)
         self.olcum_sub_buttons.append(self.alan_olc_btn)
+        self.left_panel_buttons.append(self.alan_olc_btn)
         # Ölçüm alt butonlarını aç/kapa fonksiyonu
         def toggle_olcum_sub_buttons():
             visible = not self.olcum_sub_buttons[0].isVisible()
@@ -416,7 +375,8 @@ class MainWindow(QWidget):
         self.ortala_btn = QPushButton("🎯 Ortala")
         self.ortala_btn.setStyleSheet(about_btn.styleSheet())
         self.ortala_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.insertWidget(vbox.indexOf(about_btn), self.ortala_btn)
+        vbox.addWidget(self.ortala_btn)
+        self.left_panel_buttons.append(self.ortala_btn)
         def ortala_model():
             if hasattr(self, 'occ_widget') and hasattr(self.occ_widget, 'display'):
                 self.occ_widget.display.FitAll()
@@ -427,7 +387,8 @@ class MainWindow(QWidget):
         logs_btn = QPushButton("📝 Loglar")
         logs_btn.setStyleSheet(about_btn.styleSheet())
         logs_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.insertWidget(vbox.indexOf(about_btn), logs_btn)
+        vbox.addWidget(logs_btn)
+        self.left_panel_buttons.append(logs_btn)
         def show_logs():
             try:
                 with open(log_path, 'r', encoding='utf-8') as f:
@@ -489,6 +450,7 @@ class MainWindow(QWidget):
         self.printer_btn.setStyleSheet(about_btn.styleSheet())
         self.printer_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         vbox.insertWidget(vbox.indexOf(help_btn)+1, self.printer_btn)
+        self.left_panel_buttons.append(self.printer_btn)
         def send_to_printer():
             from PyQt5.QtWidgets import QFileDialog, QMessageBox
             import tempfile, os
@@ -731,11 +693,11 @@ class MainWindow(QWidget):
 
         # Sol panelde (create_left_panel) vbox.addStretch() en sona taşınacak
         vbox.addStretch()
-        scroll_area.setWidget(scroll_content)
+        self.scroll_area.setWidget(self.scroll_content)
         layout = QVBoxLayout(left_frame)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addWidget(scroll_area)
+        layout.addWidget(self.scroll_area)
         return left_frame 
 
     ## \brief Orta paneli (3D model görüntüleme alanı) oluşturur.
@@ -1065,7 +1027,272 @@ class MainWindow(QWidget):
 
         # Sağ panelde (create_right_panel) self.right_top_vbox.addStretch() ve self.right_bottom_vbox.addStretch() en sona taşınacak
         self.right_top_vbox.addStretch()
+        
+        # --- TEMA TOGGLE BUTONU EKLE ---
+        self.is_light_theme = False  # Başlangıçta koyu tema
+        self.theme_toggle_btn = QPushButton("🌞 Açık Tema")
+        self.theme_toggle_btn.setStyleSheet(self.about_btn_style if hasattr(self, 'about_btn_style') else "")
+        self.theme_toggle_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.right_bottom_vbox.addWidget(self.theme_toggle_btn)
+
+        def apply_light_theme():
+            # Ana pencere arka planı
+            self.setStyleSheet("background-color: #f5f5f5;")
+            # Sol panel
+            if hasattr(self, 'left_frame'):
+                self.left_frame.setStyleSheet("background-color: #f9f9f9; border-radius: 12px;")
+            # Sağ panel
+            self.right_frame.setStyleSheet("background-color: #f9f9f9; border-radius: 12px;")
+            # Sağ panel içerik alanı
+            self.right_content_label.setStyleSheet("background: #fff; color: #232836; border-radius: 10px; padding: 12px;")
+            self.right_scroll_area.setStyleSheet("background: #fff; border-radius: 10px;")
+            # Katman listesi
+            self.layer_list.setStyleSheet("""
+                QListWidget {
+                    background: #fff;
+                    color: #232836;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 10px;
+                    font-size: 15px;
+                    margin-bottom: 10px;
+                    padding: 6px;
+                }
+                QListWidget::item:selected {
+                    background: #e0e0e0;
+                    color: #232836;
+                    border-radius: 8px;
+                }
+            """)
+            # Sağ paneldeki butonlar
+            light_btn_style = """
+                QPushButton {
+                    background-color: #e0e0e0;
+                    color: #232836;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 12px 0 12px 18px;
+                    font-size: 17px;
+                    text-align: left;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600;
+                    color: #232836;
+                }
+            """
+            for btn in [self.color_btn, self.bgcolor_btn, self.delete_layer_btn, self.theme_toggle_btn]:
+                btn.setStyleSheet(light_btn_style)
+            # Katman hareket/döndürme butonları
+            light_katman_btn_style = """
+                QPushButton {
+                    background-color: #e0e0e0;
+                    color: #232836;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 4px 8px;
+                    font-size: 16px;
+                    min-width: 28px;
+                    min-height: 28px;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600;
+                    color: #232836;
+                }
+            """
+            for btn in [self.up_btn, self.down_btn, self.left_btn, self.right_btn, self.rotate_x_btn, self.rotate_y_btn, self.rotate_z_btn]:
+                btn.setStyleSheet(light_katman_btn_style)
+            # Sol paneli de açık temaya geçir
+            if hasattr(self, 'apply_left_panel_light_theme'):
+                self.apply_left_panel_light_theme()
+            elif 'apply_left_panel_light_theme' in locals():
+                apply_left_panel_light_theme()
+            # Model arka plan rengini #61ffa3 yap
+            if hasattr(self, 'occ_widget') and hasattr(self.occ_widget, 'display') and hasattr(self.occ_widget.display, 'View'):
+                from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
+                r, g, b = 97/255.0, 255/255.0, 163/255.0
+                self.occ_widget.display.View.SetBackgroundColor(Quantity_Color(r, g, b, Quantity_TOC_RGB))
+                self.occ_widget.display.Repaint()
+
+        def apply_dark_theme():
+            self.setStyleSheet("background-color: #181c24;")
+            if hasattr(self, 'left_frame'):
+                self.left_frame.setStyleSheet("background-color: #232836; border-radius: 12px;")
+            self.right_frame.setStyleSheet("background-color: #232836; border-radius: 12px;")
+            self.right_content_label.setStyleSheet("background: #232836; color: #bfc7e6; border-radius: 10px; padding: 12px;")
+            self.right_scroll_area.setStyleSheet("background: #232836; border-radius: 10px;")
+            self.layer_list.setStyleSheet("""
+                QListWidget {
+                    background: #232836;
+                    color: #bfc7e6;
+                    border: 2px solid #353b4a;
+                    border-radius: 10px;
+                    font-size: 15px;
+                    margin-bottom: 10px;
+                    padding: 6px;
+                }
+                QListWidget::item:selected {
+                    background: #353b4a;
+                    color: #FFD600;
+                    border-radius: 8px;
+                }
+            """)
+            dark_btn_style = """
+                QPushButton {
+                    background-color: #353b4a;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 12px 0 12px 18px;
+                    font-size: 17px;
+                    text-align: left;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600;
+                    color: #232836;
+                }
+            """
+            for btn in [self.color_btn, self.bgcolor_btn, self.delete_layer_btn, self.theme_toggle_btn]:
+                btn.setStyleSheet(dark_btn_style)
+            dark_katman_btn_style = """
+                QPushButton {
+                    background-color: #353b4a;
+                    color: #FFD600;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 4px 8px;
+                    font-size: 16px;
+                    min-width: 28px;
+                    min-height: 28px;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600;
+                    color: #232836;
+                }
+            """
+            for btn in [self.up_btn, self.down_btn, self.left_btn, self.right_btn, self.rotate_x_btn, self.rotate_y_btn, self.rotate_z_btn]:
+                btn.setStyleSheet(dark_katman_btn_style)
+            if hasattr(self, 'apply_left_panel_dark_theme'):
+                self.apply_left_panel_dark_theme()
+            elif 'apply_left_panel_dark_theme' in locals():
+                apply_left_panel_dark_theme()
+            # Model arka plan rengini koyu yap
+            if hasattr(self, 'occ_widget') and hasattr(self.occ_widget, 'display') and hasattr(self.occ_widget.display, 'View'):
+                from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
+                r, g, b = 24/255.0, 28/255.0, 36/255.0
+                self.occ_widget.display.View.SetBackgroundColor(Quantity_Color(r, g, b, Quantity_TOC_RGB))
+                self.occ_widget.display.Repaint()
+
+        def apply_left_panel_dark_theme():
+            if hasattr(self, 'left_frame'):
+                self.left_frame.setStyleSheet("background-color: #232836; border-radius: 12px;")
+            if hasattr(self, 'scroll_area'):
+                self.scroll_area.setStyleSheet("background: transparent; border: none;")
+            if hasattr(self, 'scroll_content'):
+                self.scroll_content.setStyleSheet("background: transparent;")
+            dark_btn_style = """
+                QPushButton {
+                    background-color: #353b4a;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 12px 0 12px 18px;
+                    font-size: 17px;
+                    text-align: left;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600;
+                    color: #232836;
+                }
+            """
+            for btn in getattr(self, 'left_panel_buttons', []):
+                btn.setStyleSheet(dark_btn_style)
+            # Ölçüm Yap ve Kesit Düzlemi butonları da koyu tema olmalı
+            if hasattr(self, 'olcum_btn'):
+                self.olcum_btn.setStyleSheet(dark_btn_style)
+            if hasattr(self, 'section_btn'):
+                self.section_btn.setStyleSheet(dark_btn_style)
+            for label in getattr(self, 'left_panel_labels', []):
+                label.setStyleSheet("color: #FFD600; letter-spacing: 3px; margin-bottom: 8px; margin-top: 8px;" if "BOXR CAD" in label.text() else "color: #bfc7e6;")
+            convert_btn_style = """
+                QPushButton {
+                    background-color: #353b4a;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 6px 0 6px 32px;
+                    font-size: 13px;
+                    margin-left: 0px;
+                    text-align: left;
+                }
+                QPushButton:hover {
+                    background-color: #444a5a;
+                    color: #fff;
+                }
+            """
+            for btn in getattr(self, 'convert_sub_buttons', []):
+                btn.setStyleSheet(convert_btn_style)
+
+        def toggle_theme():
+            if self.is_light_theme:
+                apply_dark_theme()
+                self.theme_toggle_btn.setText("🌞 Açık Tema")
+                self.is_light_theme = False
+            else:
+                apply_light_theme()
+                self.theme_toggle_btn.setText("🌙 Koyu Tema")
+                self.is_light_theme = True
+
+        self.theme_toggle_btn.clicked.connect(toggle_theme)
+
         self.right_bottom_vbox.addStretch()
+
+        # --- SOL PANEL AÇIK TEMA FONKSİYONU ---
+        def apply_left_panel_light_theme():
+            # Sol panel arka planı
+            if hasattr(self, 'left_frame'):
+                self.left_frame.setStyleSheet("background-color: #f9f9f9; border-radius: 12px;")
+            if hasattr(self, 'scroll_area'):
+                self.scroll_area.setStyleSheet("background: #f9f9f9; border: none;")
+            if hasattr(self, 'scroll_content'):
+                self.scroll_content.setStyleSheet("background: #f9f9f9;")
+            # Sol paneldeki butonlar
+            light_btn_style = """
+                QPushButton {
+                    background-color: #e0e0e0;
+                    color: #232836;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 12px 0 12px 18px;
+                    font-size: 17px;
+                    text-align: left;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600;
+                    color: #232836;
+                }
+            """
+            for btn in getattr(self, 'left_panel_buttons', []):
+                btn.setStyleSheet(light_btn_style)
+            # Özellikle ölçüm ve kesit butonları da dahil tüm butonlara açık tema uygula
+            if hasattr(self, 'olcum_btn'):
+                self.olcum_btn.setStyleSheet(light_btn_style)
+            if hasattr(self, 'kenar_olc_btn'):
+                self.kenar_olc_btn.setStyleSheet(light_btn_style)
+            if hasattr(self, 'vertex_olc_btn'):
+                self.vertex_olc_btn.setStyleSheet(light_btn_style)
+            if hasattr(self, 'alan_olc_btn'):
+                self.alan_olc_btn.setStyleSheet(light_btn_style)
+            if hasattr(self, 'section_btn'):
+                self.section_btn.setStyleSheet(light_btn_style)
+            if hasattr(self, 'save_section_btn'):
+                self.save_section_btn.setStyleSheet(light_btn_style)
+            # Sol paneldeki başlık ve label'lar
+            for lbl in getattr(self, 'left_panel_labels', []):
+                if lbl.text() == "BOXR CAD":
+                    lbl.setStyleSheet("color: #FFD600; letter-spacing: 3px; margin-bottom: 8px; margin-top: 8px; background: transparent;")
+                elif lbl.text() == "Dosya İşlemleri":
+                    lbl.setStyleSheet("color: #232836; background: transparent;")
+                else:
+                    lbl.setStyleSheet("color: #232836; background: transparent;")
 
         return self.right_frame
 
