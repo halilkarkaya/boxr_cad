@@ -1495,3 +1495,39 @@
 2025-07-25 17:40:23,770 - INFO - backend loaded: pyqt5
 2025-07-25 17:40:25,164 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
 2025-07-25 17:40:25,164 - INFO - Uygulama başlatıldı.
+2025-07-25 18:43:19,322 - INFO - backend loaded: pyqt5
+2025-07-25 18:43:20,871 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 18:43:20,871 - INFO - Uygulama başlatıldı.
+2025-07-25 20:58:00,702 - INFO - backend loaded: pyqt5
+2025-07-25 20:58:02,662 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 20:58:02,666 - INFO - Uygulama başlatıldı.
+2025-07-25 21:00:50,742 - INFO - backend loaded: pyqt5
+2025-07-25 21:00:51,702 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 21:00:51,702 - INFO - Uygulama başlatıldı.
+2025-07-25 22:41:37,070 - INFO - backend loaded: pyqt5
+2025-07-25 22:41:38,341 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 22:41:41,835 - INFO - backend loaded: pyqt5
+2025-07-25 22:41:42,487 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 22:41:53,606 - INFO - backend loaded: pyqt5
+2025-07-25 22:41:54,224 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 22:41:54,224 - INFO - Uygulama başlatıldı.
+2025-07-25 22:50:55,233 - INFO - backend loaded: pyqt5
+2025-07-25 22:50:55,913 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 22:50:55,913 - INFO - Uygulama başlatıldı.
+2025-07-25 22:56:39,783 - INFO - backend loaded: pyqt5
+2025-07-25 22:56:41,686 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 22:56:41,686 - INFO - Uygulama başlatıldı.
+2025-07-25 22:56:53,227 - INFO - backend loaded: pyqt5
+2025-07-25 22:56:54,088 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 22:56:54,088 - INFO - Uygulama başlatıldı.
+2025-07-25 23:06:17,283 - INFO - Katman olarak dosya ekleniyor: C:/Users/halil/Desktop/FinalBaseMesh.obj
+2025-07-25 23:06:17,413 - INFO - triangulating faces
+2025-07-25 23:06:24,293 - INFO - Model başarıyla katman olarak yüklendi: C:/Users/halil/Desktop/FinalBaseMesh.obj
+2025-07-25 23:06:24,404 - INFO - triangulating faces
+2025-07-25 23:06:58,014 - INFO - triangulating faces
+2025-07-25 23:10:13,892 - INFO - backend loaded: pyqt5
+2025-07-25 23:10:14,903 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 23:10:14,903 - INFO - Uygulama başlatıldı.
+2025-07-25 23:35:34,986 - INFO - backend loaded: pyqt5
+2025-07-25 23:35:35,656 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-25 23:35:35,656 - INFO - Uygulama başlatıldı.

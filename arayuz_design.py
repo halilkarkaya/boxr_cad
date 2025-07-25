@@ -3,6 +3,8 @@
 
 import os
 import logging
+import subprocess
+import sys
 
 log_path = os.path.join(os.path.dirname(__file__), 'uygulama.log')
 logging.basicConfig(
@@ -291,6 +293,28 @@ class MainWindow(QWidget):
         vbox.addWidget(model_info_btn)
         model_info_btn.clicked.connect(self.show_model_info_in_panel)
         self.left_panel_buttons.append(model_info_btn)
+
+        # AR'da Görüntüle butonu
+        self.ar_btn = QPushButton("📱 AR'da Görüntüle")
+        self.ar_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #353b4a;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 12px 0 12px 18px;
+                font-size: 17px;
+                text-align: left;
+            }
+            QPushButton:hover {
+                background-color: #FFD600;
+                color: #232836;
+            }
+        """)
+        self.ar_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.ar_btn)
+        self.left_panel_buttons.append(self.ar_btn)
+        self.ar_btn.clicked.connect(self.show_ar_preview)
 
         # Hakkında butonu
         about_btn = QPushButton("❔ Hakkında")
@@ -1372,6 +1396,21 @@ class MainWindow(QWidget):
         return self.right_frame
 
     # MainWindow'un metodu olarak ekle:
+    def show_ar_preview(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "AR Önizlemesi için Model Seç", "", "3D Modeller (*.glb *.gltf)")
+        if file_path:
+            try:
+                # ar_server.py'nin tam yolunu al
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                ar_server_path = os.path.join(script_dir, 'ar_server.py')
+                
+                # ar_server.py'yi yeni bir işlem olarak başlat
+                # subprocess.Popen, GUI'yi bloklamadan arka planda çalışmasını sağlar
+                subprocess.Popen([sys.executable, ar_server_path, file_path])
+                QMessageBox.information(self, "AR Sunucusu Başlatıldı", f"'{os.path.basename(file_path)}' modeli için AR sunucusu başlatıldı. Açılan penceredeki QR kodu tarayın.")
+            except Exception as e:
+                QMessageBox.critical(self, "Hata", f"AR sunucusu başlatılırken bir hata oluştu: {e}")
+
     def mesafe_olc(self):
         if hasattr(self, 'occ_widget'):
             self.occ_widget.set_measure_mode(True)
