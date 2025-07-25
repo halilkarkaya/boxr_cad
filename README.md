@@ -2,7 +2,6 @@
 
 ![Uygulama Ekran Görüntüsü](image.png)
 
-![Uygulama Arayüzü](https://i.imgur.com/your_screenshot.png)  <!-- Lütfen buraya kendi ekran görüntünüzü ekleyin -->
 
 ## ✨ Temel Özellikler
 
