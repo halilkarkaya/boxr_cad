@@ -33,9 +33,12 @@
     Projeyi çalıştırmak için aşağıdaki kütüphanelerin sisteminizde kurulu olması gerekmektedir.
 
     ```bash
-    pip install PyQt5 pythonocc-core trimesh
+    pip install PyQt5 trimesh
     ```
 
+    ```conda prompt
+    conda install pythonocc-core 
+    ```
 2.  **Uygulamayı Başlatın:**
     Proje dizinindeyken aşağıdaki komutu çalıştırın:
 
