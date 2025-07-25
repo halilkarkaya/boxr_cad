@@ -243,6 +243,8 @@ class MainWindow(QWidget):
             sub_btn.setStyleSheet(convert_btn_style)
             sub_btn.setVisible(False)
             sub_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            sub_btn.setFixedHeight(32)
+            sub_btn.setFont(QFont(sub_btn.font().family(), 13))
             vbox.addWidget(sub_btn)
             self.convert_sub_buttons.append(sub_btn)
 
@@ -346,6 +348,8 @@ class MainWindow(QWidget):
         self.kenar_olc_btn = QPushButton("📏 Kenar Ölç")
         self.kenar_olc_btn.setStyleSheet(olcum_sub_btn_style)
         self.kenar_olc_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.kenar_olc_btn.setFixedHeight(32)
+        self.kenar_olc_btn.setFont(QFont(self.kenar_olc_btn.font().family(), 13))
         self.kenar_olc_btn.setVisible(False)
         vbox.insertWidget(vbox.indexOf(self.olcum_btn)+1, self.kenar_olc_btn)
         self.olcum_sub_buttons.append(self.kenar_olc_btn)
@@ -353,6 +357,8 @@ class MainWindow(QWidget):
         self.vertex_olc_btn = QPushButton("🟡 Vertex Ölç")
         self.vertex_olc_btn.setStyleSheet(olcum_sub_btn_style)
         self.vertex_olc_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.vertex_olc_btn.setFixedHeight(32)
+        self.vertex_olc_btn.setFont(QFont(self.vertex_olc_btn.font().family(), 13))
         self.vertex_olc_btn.setVisible(False)
         vbox.insertWidget(vbox.indexOf(self.kenar_olc_btn)+1, self.vertex_olc_btn)
         self.olcum_sub_buttons.append(self.vertex_olc_btn)
@@ -360,6 +366,8 @@ class MainWindow(QWidget):
         self.alan_olc_btn = QPushButton("🟦 Alan Ölç")
         self.alan_olc_btn.setStyleSheet(olcum_sub_btn_style)
         self.alan_olc_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.alan_olc_btn.setFixedHeight(32)
+        self.alan_olc_btn.setFont(QFont(self.alan_olc_btn.font().family(), 13))
         self.alan_olc_btn.setVisible(False)
         vbox.insertWidget(vbox.indexOf(self.vertex_olc_btn)+1, self.alan_olc_btn)
         self.olcum_sub_buttons.append(self.alan_olc_btn)
@@ -1212,7 +1220,30 @@ class MainWindow(QWidget):
                 self.section_btn.setStyleSheet(dark_btn_style)
             for label in getattr(self, 'left_panel_labels', []):
                 label.setStyleSheet("color: #FFD600; letter-spacing: 3px; margin-bottom: 8px; margin-top: 8px;" if "BOXR CAD" in label.text() else "color: #bfc7e6;")
-            convert_btn_style = """
+            # Ölçüm alt butonları (küçük, tema uyumlu)
+            dark_olcum_sub_btn_style = """
+                QPushButton {
+                    background-color: #444a5a;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 6px 0 6px 32px;
+                    font-size: 13px;
+                    margin-left: 0px;
+                    text-align: left;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600;
+                    color: #232836;
+                }
+            """
+            for btn in [getattr(self, 'kenar_olc_btn', None), getattr(self, 'vertex_olc_btn', None), getattr(self, 'alan_olc_btn', None)]:
+                if btn:
+                    btn.setStyleSheet(dark_olcum_sub_btn_style)
+                    btn.setFixedHeight(32) # Sabit yükseklik
+                    btn.setFont(QFont(btn.font().family(), 13))
+            # Dönüştürme alt butonları için özel stil
+            dark_convert_sub_btn_style = """
                 QPushButton {
                     background-color: #353b4a;
                     color: #fff;
@@ -1229,7 +1260,9 @@ class MainWindow(QWidget):
                 }
             """
             for btn in getattr(self, 'convert_sub_buttons', []):
-                btn.setStyleSheet(convert_btn_style)
+                btn.setStyleSheet(dark_convert_sub_btn_style)
+                btn.setFixedHeight(32) # Sabit yükseklik
+                btn.setFont(QFont(btn.font().family(), 13))
 
         def toggle_theme():
             if self.is_light_theme:
@@ -1285,6 +1318,48 @@ class MainWindow(QWidget):
                 self.section_btn.setStyleSheet(light_btn_style)
             if hasattr(self, 'save_section_btn'):
                 self.save_section_btn.setStyleSheet(light_btn_style)
+            # Ölçüm alt butonları için özel stil
+            light_olcum_sub_btn_style = """
+                QPushButton {
+                    background-color: #e0e0e0; /* Light theme background */
+                    color: #232836; /* Dark text for light theme */
+                    border: none;
+                    border-radius: 8px;
+                    padding: 6px 0 6px 32px; /* Smaller padding */
+                    font-size: 13px; /* Smaller font size */
+                    margin-left: 0px;
+                    text-align: left;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600; /* Hover color */
+                    color: #232836; /* Hover text color */
+                }
+            """
+            if hasattr(self, 'kenar_olc_btn'):
+                self.kenar_olc_btn.setStyleSheet(light_olcum_sub_btn_style)
+            if hasattr(self, 'vertex_olc_btn'):
+                self.vertex_olc_btn.setStyleSheet(light_olcum_sub_btn_style)
+            if hasattr(self, 'alan_olc_btn'):
+                self.alan_olc_btn.setStyleSheet(light_olcum_sub_btn_style)
+            # Dönüştürme alt butonları için özel stil
+            light_convert_sub_btn_style = """
+                QPushButton {
+                    background-color: #e0e0e0; /* Light theme background */
+                    color: #232836; /* Dark text for light theme */
+                    border: none;
+                    border-radius: 8px;
+                    padding: 6px 0 6px 32px; /* Smaller padding */
+                    font-size: 13px; /* Smaller font size */
+                    margin-left: 0px;
+                    text-align: left;
+                }
+                QPushButton:hover {
+                    background-color: #FFD600; /* Hover color */
+                    color: #232836; /* Hover text color */
+                }
+            """
+            for btn in getattr(self, 'convert_sub_buttons', []):
+                btn.setStyleSheet(light_convert_sub_btn_style)
             # Sol paneldeki başlık ve label'lar
             for lbl in getattr(self, 'left_panel_labels', []):
                 if lbl.text() == "BOXR CAD":

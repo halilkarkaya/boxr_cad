@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication  # \brief PyQt5 uygulama nesnesi için
 import sys  # \brief Sistem argümanları ve çıkış işlemleri için
 from arayuz_design import MainWindow  # \brief Arayüz tasarımını içe aktarır
 import logging  # \brief Loglama işlemleri için
+from PyQt5.QtGui import QFont
 
 ## \details
 # Loglama yapılandırması: uygulama.log dosyasına INFO seviyesinde log kaydı tutar.
