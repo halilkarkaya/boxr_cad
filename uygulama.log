@@ -1531,3 +1531,40 @@
 2025-07-25 23:35:34,986 - INFO - backend loaded: pyqt5
 2025-07-25 23:35:35,656 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
 2025-07-25 23:35:35,656 - INFO - Uygulama başlatıldı.
+2025-07-26 18:08:39,053 - INFO - backend loaded: pyqt5
+2025-07-26 18:08:39,764 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:08:39,773 - INFO - Uygulama başlatıldı.
+2025-07-26 18:08:44,790 - INFO - key: code 16777249 not mapped to any function
+2025-07-26 18:08:45,967 - INFO - key: code 16777249 not mapped to any function
+2025-07-26 18:36:41,248 - INFO - backend loaded: pyqt5
+2025-07-26 18:42:41,365 - INFO - backend loaded: pyqt5
+2025-07-26 18:42:42,140 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:42:42,151 - INFO - Uygulama başlatıldı.
+2025-07-26 18:43:53,329 - INFO - backend loaded: pyqt5
+2025-07-26 18:43:54,174 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:43:54,174 - INFO - Uygulama başlatıldı.
+2025-07-26 18:44:01,201 - INFO - backend loaded: pyqt5
+2025-07-26 18:44:02,044 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:44:02,044 - INFO - Uygulama başlatıldı.
+2025-07-26 18:46:47,936 - INFO - backend loaded: pyqt5
+2025-07-26 18:46:48,775 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:46:48,775 - INFO - Uygulama başlatıldı.
+2025-07-26 18:47:22,674 - INFO - backend loaded: pyqt5
+2025-07-26 18:47:23,539 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:47:23,539 - INFO - Uygulama başlatıldı.
+2025-07-26 18:48:52,400 - INFO - backend loaded: pyqt5
+2025-07-26 18:48:53,257 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:48:53,262 - INFO - Uygulama başlatıldı.
+2025-07-26 18:49:17,468 - INFO - triangulating faces
+2025-07-26 18:49:49,372 - INFO - key: code 16777249 not mapped to any function
+2025-07-26 18:50:34,921 - INFO - backend loaded: pyqt5
+2025-07-26 18:50:35,716 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:50:35,716 - INFO - Uygulama başlatıldı.
+2025-07-26 18:51:54,770 - INFO - backend loaded: pyqt5
+2025-07-26 18:51:55,475 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:51:55,476 - INFO - Uygulama başlatıldı.
+2025-07-26 18:56:09,284 - INFO - backend loaded: pyqt5
+2025-07-26 18:56:10,075 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-26 18:56:10,075 - INFO - Uygulama başlatıldı.
+2025-07-26 18:57:55,209 - INFO - key: code 16777249 not mapped to any function
+2025-07-26 18:57:55,824 - INFO - key: code 16777249 not mapped to any function

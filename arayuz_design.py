@@ -20,12 +20,12 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QColor, QPalette, QPixmap
-from cad_viewer import dosya_secici_ac, OCCModelWidget, obj_to_stl, create_progress_bar
+from cad_viewer import OCCModelWidget, create_progress_bar
 from OCC.Display.backend import load_backend
 load_backend("pyqt5")
 from OCC.Display.qtDisplay import qtViewer3d
 from OCC.Extend.DataExchange import read_stl_file
-from converter import obj_to_glb, stl_to_obj, obj_to_fbx
+from converter import obj_to_glb, stl_to_obj, obj_to_fbx, convert_to_glb, convert_to_fbx, convert_to_obj, convert_to_step, convert_to_ply, convert_to_gltf, convert_to_3mf, convert_to_dae, convert_step_to_stl, convert_step_to_obj, dosya_secici_ac, obj_to_stl
 
 ## \class MainWindow
 #  \brief Ana uygulama penceresi, 3 ana panel içerir.
@@ -337,6 +337,7 @@ class MainWindow(QWidget):
         self.about_btn_style = about_btn.styleSheet()
         vbox.addWidget(about_btn)
         self.left_panel_buttons.append(about_btn)
+        about_btn.clicked.connect(self.show_about_dialog)
 
         # --- YARDIM / SSS BUTONU ---
         help_btn = QPushButton("💡 Yardım / SSS")
@@ -1429,6 +1430,69 @@ class MainWindow(QWidget):
             self.log_download_btn.setParent(None)
             self.log_download_btn = None
 
+    def show_about_dialog(self):
+        """Hakkında penceresini gösterir."""
+        html = self.logo_img_html + \
+            "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>" \
+            "<p><b>Versiyon:</b> 1.0.0</p>" \
+            "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>" \
+            "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>" \
+            "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>" \
+            "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>" \
+            "<li style='margin-bottom:2px;'>STL (.stl)</li>" \
+            "<li style='margin-bottom:2px;'>FBX (.fbx)</li>" \
+            "<li style='margin-bottom:2px;'>GLB (.glb)</li>" \
+            "<li style='margin-bottom:2px;'>OBJ (.obj)</li>" \
+            "</ul>" \
+            "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>" \
+            "</div>"
+        self.right_content_label.setText(html)
+
+    def convert_to_glb(self):
+        convert_to_glb(self)
+
+    def convert_to_fbx(self):
+        convert_to_fbx(self)
+
+    def convert_to_obj(self):
+        convert_to_obj(self)
+
+    def convert_to_step(self):
+        convert_to_step(self)
+
+    def convert_to_ply(self):
+        convert_to_ply(self)
+
+    def convert_to_gltf(self):
+        convert_to_gltf(self)
+
+    def convert_to_3mf(self):
+        convert_to_3mf(self)
+
+    def convert_to_dae(self):
+        convert_to_dae(self)
+
+    def convert_step_to_stl(self):
+        convert_step_to_stl(self)
+
+    def convert_step_to_obj(self):
+        convert_step_to_obj(self)
+
+    def show_model_info_in_panel(self):
+        """Sağ panelde mevcut modelin bilgilerini gösterir."""
+        if hasattr(self, 'right_content_label'):
+            info = self.occ_widget.get_model_info()
+            html = self.logo_img_html
+            html += "<div style='font-size:15px; color:#bfc7e6;'><b>Model Bilgileri:</b><br>"
+            for k, v in info.items():
+                html += f"<b>{k}:</b> {v}<br>"
+            html += "</div>"
+            self.right_content_label.setText(html)
+            # Log indirme butonunu da kaldır
+            if hasattr(self, 'log_download_btn') and self.log_download_btn is not None:
+                self.log_download_btn.setParent(None)
+                self.log_download_btn = None
+
     def show_shape_info_in_panel(self, info, title=None, is_html=False):
         if is_html:
             self.right_content_label.setText(info)
@@ -1488,310 +1552,7 @@ class MainWindow(QWidget):
             self.log_download_btn.setParent(None)
             self.log_download_btn = None
    
-    def show_measure_popup(self, info, title="Ölçüm Sonucu"):
-        from PyQt5.QtWidgets import QMessageBox
-        html = f"""
-        <div style='background:#232836; border-radius:16px; padding:18px 18px 8px 18px; min-width:340px;'>
-            <div style='font-size:22px; color:#FFD600; font-weight:bold; margin-bottom:10px; letter-spacing:1px;'>
-                <span style='font-size:28px; vertical-align:middle;'>📏</span> {title}
-            </div>
-            <table style='width:100%; border-collapse:separate; border-spacing:0 10px; font-size:16px; color:#bfc7e6;'>
-        """
-        for k, v in info.items():
-            if k == 'Uzunluk':
-                html += ("<tr>"
-                         "<td style='background:#282d3a; border-radius:7px; border:1.5px solid #FFD600; padding:8px 14px; color:#FFD600; font-weight:bold;'>Uzunluk:</td>"
-                         f"<td style='background:#232836; border-radius:7px; border:1.5px solid #353b4a; padding:8px 14px; color:#FFD600; font-weight:bold;'><b>{v:.2f} birim</b></td>"
-                         "</tr>")
-            elif k == 'Alan':
-                html += ("<tr>"
-                         "<td style='background:#282d3a; border-radius:7px; border:1.5px solid #FFD600; padding:8px 14px; color:#FFD600; font-weight:bold;'>Alan:</td>"
-                         f"<td style='background:#232836; border-radius:7px; border:1.5px solid #353b4a; padding:8px 14px; color:#FFD600; font-weight:bold;'><b>{v:.2f} birim²</b></td>"
-                         "</tr>")
-            else:
-                html += ("<tr>"
-                         f"<td style='background:#282d3a; border-radius:7px; border:1.5px solid #353b4a; padding:8px 14px; color:#FFD600; font-weight:bold;'>{k}:</td>"
-                         f"<td style='background:#232836; border-radius:7px; border:1.5px solid #353b4a; padding:8px 14px; color:#bfc7e6;'>{v}</td>"
-                         "</tr>")
-        html += "</table></div>"
+    
 
-        msg = QMessageBox(self)
-        msg.setWindowTitle(title)
-        msg.setTextFormat(1)  # Qt.RichText
-        msg.setStyleSheet("""
-            QMessageBox {
-                background-color: #232836;
-                border-radius: 16px;
-            }
-            QLabel {
-                color: #bfc7e6;
-                font-size: 16px;
-            }
-            QPushButton {
-                background-color: #FFD600;
-                color: #232836;
-                border-radius: 8px;
-                padding: 8px 18px;
-                font-weight: bold;
-                font-size: 15px;
-            }
-            QPushButton:hover {
-                background-color: #fff176;
-                color: #232836;
-            }
-        """)
-        msg.setText(html)
-        msg.exec_()
-   
-    def show_model_info_in_panel(self):
-        """Sağ panelde mevcut modelin bilgilerini gösterir."""
-        if hasattr(self, 'right_content_label'):
-            info = self.occ_widget.get_model_info()
-            html = self.logo_img_html
-            html += "<div style='font-size:15px; color:#bfc7e6;'><b>Model Bilgileri:</b><br>"
-            for k, v in info.items():
-                html += f"<b>{k}:</b> {v}<br>"
-            html += "</div>"
-            self.right_content_label.setText(html)
-            # Log indirme butonunu da kaldır
-            if hasattr(self, 'log_download_btn') and self.log_download_btn is not None:
-                self.log_download_btn.setParent(None)
-                self.log_download_btn = None
-
-    def convert_to_glb(self):
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        if not source_path.lower().endswith('.obj'):
-            QMessageBox.warning(self, "Desteklenmeyen Format", "GLB formatına sadece OBJ dosyaları dönüştürülebilir.")
-            return
-        
-        default_name = os.path.splitext(os.path.basename(source_path))[0] + ".glb"
-        save_path, _ = QFileDialog.getSaveFileName(self, "GLB Olarak Kaydet", default_name, "GLB Dosyası (*.glb)")
-        if not save_path: return
-        
-        try:
-            # converter.py'deki fonksiyonun çıktısını yönet
-            result_path = obj_to_glb(source_path)
-            # Eğer fonksiyon belirli bir yere kaydediyorsa, onu istenen yere taşı/kopyala
-            if result_path != save_path:
-                import shutil
-                shutil.move(result_path, save_path)
-            QMessageBox.information(self, "Başarılı", f"Dosya GLB formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"GLB'ye dönüştürme başarısız: {e}")
-
-    def convert_to_fbx(self):
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        if not source_path.lower().endswith('.obj'):
-            QMessageBox.warning(self, "Desteklenmeyen Format", "FBX formatına sadece OBJ dosyaları dönüştürülebilir.")
-            return
-
-        default_name = os.path.splitext(os.path.basename(source_path))[0] + ".fbx"
-        save_path, _ = QFileDialog.getSaveFileName(self, "FBX Olarak Kaydet", default_name, "FBX Dosyası (*.fbx)")
-        if not save_path: return
-
-        try:
-            # Blender yolunu burada belirtin veya bir ayar dosyasından okuyun
-            blender_path = r'D:\blender\blender-launcher.exe'
-            result = obj_to_fbx(source_path, save_path, blender_path)
-            if result:
-                QMessageBox.information(self, "Başarılı", f"Dosya FBX formatına dönüştürüldü:\n{save_path}")
-            else:
-                raise Exception("Dönüştürme işlemi başarısız oldu. Blender konsolunu kontrol edin.")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"FBX'e dönüştürme başarısız: {e}")
-
-    def convert_to_obj(self):
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        if not source_path.lower().endswith('.stl'):
-            QMessageBox.warning(self, "Desteklenmeyen Format", "OBJ formatına sadece STL dosyaları dönüştürülebilir.")
-            return
-
-        default_name = os.path.splitext(os.path.basename(source_path))[0] + ".obj"
-        save_path, _ = QFileDialog.getSaveFileName(self, "OBJ Olarak Kaydet", default_name, "OBJ Dosyası (*.obj)")
-        if not save_path: return
-        
-        try:
-            result_path = stl_to_obj(source_path)
-            if result_path != save_path:
-                import shutil
-                shutil.move(result_path, save_path)
-            QMessageBox.information(self, "Başarılı", f"Dosya OBJ formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"OBJ'ye dönüştürme başarısız: {e}")
-
-    def convert_to_step(self):
-        from OCC.Extend.DataExchange import write_step_file, read_stl_file, read_iges_file
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        
-        ext = os.path.splitext(source_path)[1].lower()
-        shape = None
-        try:
-            if ext in ['.obj', '.stl']:
-                if ext == '.obj':
-                    import trimesh
-                    mesh = trimesh.load(source_path, force='mesh')
-                    temp_stl = os.path.splitext(source_path)[0] + "_temp.stl"
-                    mesh.export(temp_stl, file_type='stl')
-                    shape = read_stl_file(temp_stl)
-                    os.remove(temp_stl)
-                else: # .stl
-                    shape = read_stl_file(source_path)
-            elif ext in ['.iges', '.igs']:
-                shape = read_iges_file(source_path)
-            elif ext in ['.step', '.stp']:
-                 QMessageBox.information(self, "Bilgi", "Seçilen dosya zaten bir STEP dosyası.")
-                 return
-            else:
-                QMessageBox.warning(self, "Desteklenmeyen Format", "Bu dosya formatı STEP'e dönüştürülemez.")
-                return
-
-            if shape is None:
-                raise ValueError("Dosya okunamadı veya boş.")
-
-            default_name = os.path.splitext(os.path.basename(source_path))[0] + ".step"
-            save_path, _ = QFileDialog.getSaveFileName(self, "STEP Olarak Kaydet", default_name, "STEP Dosyası (*.step *.stp)")
-            if not save_path: return
-
-            write_step_file(shape, save_path)
-            QMessageBox.information(self, "Başarılı", f"Dosya STEP formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"STEP'e dönüştürme başarısız: {e}")
-
-    def convert_to_ply(self):
-        import trimesh
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        ext = os.path.splitext(source_path)[1].lower()
-        if ext not in ['.obj', '.stl', '.glb']:
-            QMessageBox.warning(self, "Desteklenmeyen Format", "PLY'ye sadece OBJ, STL veya GLB dosyaları dönüştürülebilir.")
-            return
-        mesh = trimesh.load(source_path, force='mesh')
-        default_name = os.path.splitext(os.path.basename(source_path))[0] + ".ply"
-        save_path, _ = QFileDialog.getSaveFileName(self, "PLY Olarak Kaydet", default_name, "PLY Dosyası (*.ply)")
-        if not save_path: return
-        try:
-            mesh.export(save_path, file_type='ply')
-            QMessageBox.information(self, "Başarılı", f"Dosya PLY formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"PLY'ye dönüştürme başarısız: {e}")
-
-    def convert_to_gltf(self):
-        import trimesh
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        ext = os.path.splitext(source_path)[1].lower()
-        if ext not in ['.obj', '.stl']:
-            QMessageBox.warning(self, "Desteklenmeyen Format", "GLTF'ye sadece OBJ veya STL dosyaları dönüştürülebilir.")
-            return
-        mesh = trimesh.load(source_path, force='mesh')
-        default_name = os.path.splitext(os.path.basename(source_path))[0] + ".gltf"
-        save_path, _ = QFileDialog.getSaveFileName(self, "GLTF Olarak Kaydet", default_name, "GLTF Dosyası (*.gltf)")
-        if not save_path: return
-        try:
-            mesh.export(save_path, file_type='gltf')
-            QMessageBox.information(self, "Başarılı", f"Dosya GLTF formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"GLTF'ye dönüştürme başarısız: {e}")
-
-    def convert_to_3mf(self):
-        import trimesh
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        ext = os.path.splitext(source_path)[1].lower()
-        if ext not in ['.obj', '.stl']:
-            QMessageBox.warning(self, "Desteklenmeyen Format", "3MF'ye sadece OBJ veya STL dosyaları dönüştürülebilir.")
-            return
-        mesh = trimesh.load(source_path, force='mesh')
-        default_name = os.path.splitext(os.path.basename(source_path))[0] + ".3mf"
-        save_path, _ = QFileDialog.getSaveFileName(self, "3MF Olarak Kaydet", default_name, "3MF Dosyası (*.3mf)")
-        if not save_path: return
-        try:
-            mesh.export(save_path, file_type='3mf')
-            QMessageBox.information(self, "Başarılı", f"Dosya 3MF formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"3MF'ye dönüştürme başarısız: {e}")
-
-    def convert_to_dae(self):
-        import trimesh
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        ext = os.path.splitext(source_path)[1].lower()
-        if ext not in ['.obj', '.stl']:
-            QMessageBox.warning(self, "Desteklenmeyen Format", "DAE'ye sadece OBJ veya STL dosyaları dönüştürülebilir.")
-            return
-        mesh = trimesh.load(source_path, force='mesh')
-        default_name = os.path.splitext(os.path.basename(source_path))[0] + ".dae"
-        save_path, _ = QFileDialog.getSaveFileName(self, "DAE Olarak Kaydet", default_name, "DAE Dosyası (*.dae)")
-        if not save_path: return
-        try:
-            mesh.export(save_path, file_type='dae')
-            QMessageBox.information(self, "Başarılı", f"Dosya DAE formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"DAE'ye dönüştürme başarısız: {e}")
-
-    def convert_step_to_stl(self):
-        from OCC.Extend.DataExchange import read_step_file, read_iges_file
-        from OCC.Core.StlAPI import StlAPI_Writer
-        from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        ext = os.path.splitext(source_path)[1].lower()
-        if ext not in ['.step', '.stp', '.iges', '.igs']:
-            QMessageBox.warning(self, "Desteklenmeyen Format", "STL'ye sadece STEP veya IGES dosyaları dönüştürülebilir.")
-            return
-        if ext in ['.step', '.stp']:
-            shape = read_step_file(source_path)
-        else:
-            shape = read_iges_file(source_path)
-        default_name = os.path.splitext(os.path.basename(source_path))[0] + ".stl"
-        save_path, _ = QFileDialog.getSaveFileName(self, "STL Olarak Kaydet", default_name, "STL Dosyası (*.stl)")
-        if not save_path: return
-        try:
-            mesh = BRepMesh_IncrementalMesh(shape, 0.1)
-            mesh.Perform()
-            writer = StlAPI_Writer()
-            writer.Write(shape, save_path)
-            QMessageBox.information(self, "Başarılı", f"Dosya STL formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"STL'ye dönüştürme başarısız: {e}")
-
-    def convert_step_to_obj(self):
-        from OCC.Extend.DataExchange import read_step_file, read_iges_file
-        import trimesh
-        from OCC.Core.StlAPI import StlAPI_Writer
-        from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
-        import tempfile, os
-        source_path = dosya_secici_ac(parent=self)
-        if not source_path: return
-        ext = os.path.splitext(source_path)[1].lower()
-        if ext not in ['.step', '.stp', '.iges', '.igs']:
-            QMessageBox.warning(self, "Desteklenmeyen Format", "OBJ'ye sadece STEP veya IGES dosyaları dönüştürülebilir.")
-            return
-        if ext in ['.step', '.stp']:
-            shape = read_step_file(source_path)
-        else:
-            shape = read_iges_file(source_path)
-        # Önce geçici STL'ye export et
-        temp_stl = tempfile.mktemp(suffix='.stl')
-        try:
-            mesh = BRepMesh_IncrementalMesh(shape, 0.1)
-            mesh.Perform()
-            writer = StlAPI_Writer()
-            writer.Write(shape, temp_stl)
-            # Sonra STL'den OBJ'ye çevir
-            mesh_trimesh = trimesh.load(temp_stl, force='mesh')
-            default_name = os.path.splitext(os.path.basename(source_path))[0] + ".obj"
-            save_path, _ = QFileDialog.getSaveFileName(self, "OBJ Olarak Kaydet", default_name, "OBJ Dosyası (*.obj)")
-            if not save_path: return
-            mesh_trimesh.export(save_path, file_type='obj')
-            QMessageBox.information(self, "Başarılı", f"Dosya OBJ formatına dönüştürüldü:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Hata", f"OBJ'ye dönüştürme başarısız: {e}")
-        finally:
-            if os.path.exists(temp_stl):
-                os.remove(temp_stl)
+    
 

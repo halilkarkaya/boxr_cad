@@ -1,5 +1,8 @@
 
 
+## \file ar_server.py
+## \brief Komut satırından alınan 3D model için bir web sunucusu ve QR kod üreten betik.
+
 import sys
 import os
 import http.server
@@ -8,14 +11,15 @@ import threading
 import qrcode
 import socket
 from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QVBoxLayout
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import Qt
 
+## \fn get_local_ip
+## \brief Yerel ağdaki IP adresini alır.
+## \return Yerel IP adresi (str).
 def get_local_ip():
-    """Yerel IP adresini bulan fonksiyon."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # Bu IP adresinin ulaşılabilir olması gerekmez
         s.connect(('10.255.255.255', 1))
         IP = s.getsockname()[0]
     except Exception:
@@ -24,8 +28,13 @@ def get_local_ip():
         s.close()
     return IP
 
+## \class QRCodeDialog
+## \brief QR kodunu ve sunucu bilgilerini gösteren bir PyQt5 penceresi.
 class QRCodeDialog(QDialog):
-    """QR kodunu ve sunucu bilgilerini gösteren pencere."""
+    ## \brief QRCodeDialog kurucusu.
+    ## \param image_path Gösterilecek QR kod resminin yolu (str).
+    ## \param server_url Sunucunun web adresi (str).
+    ## \param parent Ebeveyn QWidget (opsiyonel).
     def __init__(self, image_path, server_url, parent=None):
         super().__init__(parent)
         self.setWindowTitle("AR Kodu - Telefonunuzla Tarayın")
@@ -48,13 +57,15 @@ class QRCodeDialog(QDialog):
 
         self.httpd = None
 
+    ## \brief Pencere kapatıldığında web sunucusunu durdurur.
+    ## \param event Kapatma olayı.
     def closeEvent(self, event):
-        """Pencere kapatıldığında web sunucusunu durdurur."""
         if self.httpd:
             print("Web sunucusu kapatılıyor...")
             threading.Thread(target=self.httpd.shutdown).start()
         event.accept()
 
+## \brief Betiğin ana giriş noktası.
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Hata: Lütfen bir model dosyası yolu belirtin.")
@@ -66,12 +77,10 @@ if __name__ == "__main__":
         print(f"Hata: Belirtilen dosya bulunamadı: {model_path}")
         sys.exit(1)
 
-    # Sunucunun çalışacağı dizini modelin bulunduğu dizin olarak ayarla
     file_dir = os.path.dirname(os.path.abspath(model_path))
     model_filename = os.path.basename(model_path)
     os.chdir(file_dir)
 
-    # viewer.html dosyasını sunucu dizinine kopyala (eğer yoksa)
     script_dir = os.path.dirname(os.path.abspath(__file__))
     viewer_html_src = os.path.join(script_dir, 'viewer.html')
     viewer_html_dest = os.path.join(file_dir, 'viewer.html')
@@ -82,10 +91,8 @@ if __name__ == "__main__":
     PORT = 8000
     IP_ADDRESS = get_local_ip()
     SERVER_URL = f"http://{IP_ADDRESS}:{PORT}"
-    # Model adını URL'e parametre olarak ekle
     VIEWER_URL = f"{SERVER_URL}/viewer.html?model={model_filename}"
 
-    # Web sunucusunu ayarla ve başlat
     Handler = http.server.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer(('', PORT), Handler)
     
@@ -94,21 +101,17 @@ if __name__ == "__main__":
     server_thread.daemon = True
     server_thread.start()
 
-    # Geçici QR kod resmini oluştur
     qr_img_path = os.path.join(file_dir, "temp_qr_code.png")
     qrcode.make(VIEWER_URL).save(qr_img_path)
     print(f"QR kodu oluşturuldu: {qr_img_path}")
 
-    # QR kodunu bir PyQt penceresinde göster
     app = QApplication(sys.argv)
-    from PyQt5.QtGui import QFont
     dialog = QRCodeDialog(qr_img_path, SERVER_URL)
-    dialog.httpd = httpd  # Kapatma işlemi için sunucu referansını ver
+    dialog.httpd = httpd
     dialog.show()
     
     app.exec_()
 
-    # Geçici QR kod dosyasını temizle
     if os.path.exists(qr_img_path):
         os.remove(qr_img_path)
     

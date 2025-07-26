@@ -18,35 +18,7 @@ from OCC.Core.gp import gp_Trsf, gp_Vec
 from OCC.Core.AIS import AIS_Shape
 from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
 
-## \fn dosya_secici_ac(parent=None)
-#  \brief OBJ, STL, STEP, ve IGES dosyalarını seçmek için dosya seçici açar.
-#  \param parent QWidget veya None, dosya seçici için ebeveyn pencere.
-#  \return Seçilen dosya yolu (str) veya None.
-def dosya_secici_ac(parent=None):
-    """
-    OBJ, STL, STEP, ve IGES dosyalarını seçmek için dosya seçici açar.
-    :param parent: QWidget veya None
-    :return: Seçilen dosya yolu (str) veya None
-    """
-    file_path, _ = QFileDialog.getOpenFileName(
-        parent, "3D Model Dosyası Aç", "", 
-        "Tüm Desteklenen Formatlar (*.obj *.stl *.step *.stp *.iges *.igs);;"
-        "Mesh Dosyaları (*.obj *.stl);;"
-        "CAD Dosyaları (*.step *.stp *.iges *.igs);;"
-        "Tüm Dosyalar (*.*)"
-    )
-    return file_path or None
 
-## \fn obj_to_stl(obj_path)
-#  \brief OBJ dosyasını geçici bir STL dosyasına dönüştürür.
-#  \param obj_path Kaynak OBJ dosya yolu (str).
-#  \return Oluşan geçici STL dosya yolu (str).
-def obj_to_stl(obj_path):
-    temp_dir = tempfile.gettempdir()
-    temp_stl = os.path.join(temp_dir, "temp_obj_conversion.stl")
-    mesh = trimesh.load(obj_path, force='mesh')
-    mesh.export(temp_stl, file_type='stl')
-    return temp_stl
 
 ## \fn create_progress_bar()
 #  \brief Koyu temalı özel bir QProgressBar oluşturur.
