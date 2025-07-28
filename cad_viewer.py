@@ -182,8 +182,8 @@ class OCCModelWidget(QWidget):
                                 if alanlar:
                                     info['Ait Olduğu Üçgen(ler) Alanı'] = ', '.join([f"{a:.2f}" for a in alanlar])
                                 mainwin = self.window()
-                                if hasattr(mainwin, 'show_measure_popup'):
-                                    mainwin.show_measure_popup(info, "Kenar Ölçüm Sonucu")
+                                if hasattr(mainwin, 'show_shape_info_in_panel'):
+                                    mainwin.show_shape_info_in_panel(info, "Kenar Ölçüm Sonucu")
                                 self.measure_mode = False
                                 return True
                         # Vertex Ölçüm
@@ -233,8 +233,8 @@ class OCCModelWidget(QWidget):
                             if face_areas:
                                 info['Bağlı Yüzey(ler) Alanı'] = ', '.join([f"#{fidx}: {a:.2f}" for fidx, a in face_areas])
                             mainwin = self.window()
-                            if hasattr(mainwin, 'show_measure_popup'):
-                                mainwin.show_measure_popup(info, "Vertex Ölçüm Sonucu")
+                            if hasattr(mainwin, 'show_shape_info_in_panel'):
+                                mainwin.show_shape_info_in_panel(info, "Vertex Ölçüm Sonucu")
                             self.measure_mode = False
                             return True
                         # Alan (Face) Ölçüm
@@ -312,8 +312,8 @@ class OCCModelWidget(QWidget):
                                 'Komşu Yüzeyler': ', '.join(str(idx) for idx in komsu_faces) if komsu_faces else 'Yok'
                             }
                             mainwin = self.window()
-                            if hasattr(mainwin, 'show_measure_popup'):
-                                mainwin.show_measure_popup(info, "Alan/Çoklu Yüzey Ölçüm Sonucu")
+                            if hasattr(mainwin, 'show_shape_info_in_panel'):
+                                mainwin.show_shape_info_in_panel(info, "Alan/Çoklu Yüzey Ölçüm Sonucu")
                             self.measure_mode = False
                             return True
                         # --- 2 Nokta Mesafe Ölçüm ---
