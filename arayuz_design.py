@@ -391,11 +391,11 @@ class MainWindow(QWidget):
         self.left_panel_buttons.append(logs_btn)
 
         # 11. Yardım / SSS
-        help_btn = QPushButton("💡 Yardım / SSS")
-        help_btn.setStyleSheet(main_btn_style)
-        help_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.addWidget(help_btn)
-        self.left_panel_buttons.append(help_btn)
+        self.help_btn = QPushButton("💡 Yardım / SSS")
+        self.help_btn.setStyleSheet(main_btn_style)
+        self.help_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.help_btn)
+        self.left_panel_buttons.append(self.help_btn)
 
         # 12. Hakkında
         about_btn = QPushButton("❔ Hakkında")
@@ -423,6 +423,7 @@ class MainWindow(QWidget):
         self.ar_btn.clicked.connect(self.show_ar_preview)
         self.printer_btn.clicked.connect(self.send_to_printer)
         logs_btn.clicked.connect(self.show_logs)
+        self.help_btn.clicked.connect(self.show_help_dialog)  # Yardım butonuna fonksiyonu bağla
         about_btn.clicked.connect(self.show_about_dialog)
 
         # Yeni Kesit Arayüzü Bağlantıları
@@ -1373,6 +1374,49 @@ class MainWindow(QWidget):
         self.right_frame.setVisible(True)
         self.hide_log_download_button()
         html = self.logo_img_html +             "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>"             "<p><b>Versiyon:</b> 1.0.0</p>"             "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>"             "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>"             "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>"             "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>"             "<li style='margin-bottom:2px;'>STL (.stl)</li>"             "<li style='margin-bottom:2px;'>FBX (.fbx)</li>"             "<li style='margin-bottom:2px;'>GLB (.glb)</li>"             "<li style='margin-bottom:2px;'>OBJ (.obj)</li>"             "</ul>"             "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>"             "</div>"
+        self.right_content_label.setText(html)
+
+    def show_help_dialog(self):
+        """Yardım ve Sıkça Sorulan Sorular penceresini gösterir."""
+        self.right_frame.setVisible(True)
+        self.hide_log_download_button()
+        html = self.logo_img_html + """
+        <div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:left;'>
+            <h2 style='color: #FFD600; text-align:center;'>Kullanım Kılavuzu</h2>
+            
+            <h3 style='color: #2196f3;'>1. Model Yükleme</h3>
+            <p> - <b>➕ Katman Ekle:</b> Butonuna tıklayarak veya model dosyasını (STEP, IGES, STL, OBJ) doğrudan 3D görünüm alanına sürükleyip bırakarak yeni bir katmana model yükleyebilirsiniz.</p>
+            
+            <h3 style='color: #2196f3;'>2. Katman Yönetimi</h3>
+            <p> - Sağ alttaki <b>Katmanlar</b> listesinden istediğiniz katmanı seçebilirsiniz.</p>
+            <p> - <b>Katman Görünürlüğü:</b> Katman isminin yanındaki kutucuğu işaretleyerek veya işareti kaldırarak modeli gizleyip gösterebilirsiniz.</p>
+            <p> - <b>Katman Silme:</b> Silmek istediğiniz katmanı seçip <b>🗑️ Seçili Katmanı Sil</b> butonuna basın veya katmana sağ tıklayıp silin.</p>
+            <p> - <b>Katman Taşıma/Döndürme:</b> Katmanı seçtikten sonra, katman listesinin altındaki ok (↑,↓,←,→) ve döndürme (X↻, Y↻, Z↻) butonları ile modeli hareket ettirebilirsiniz.</p>
+
+            <h3 style='color: #2196f3;'>3. Görüntüleme</h3>
+            <p> - <b>🎨 Görünüm Seçenekleri:</b> Modeli <b>Katı Model</b> veya <b>Tel Kafes</b> olarak görüntüleyebilirsiniz.</p>
+            <p> - <b>🎨 Renk Seç:</b> Seçili katmanın rengini değiştirir.</p>
+            <p> - <b>🖼️ Arka Plan Rengi:</b> 3D görüntüleyicinin arka plan rengini değiştirir.</p>
+            <p> - <b>🎯 Ortala:</b> Sahnedeki tüm modelleri ekrana sığdırır.</p>
+
+            <h3 style='color: #2196f3;'>4. Analiz ve Ölçüm</h3>
+            <p> - <b>📏 Ölçüm Yap:</b> Menüsünden <b>Kenar</b>, <b>Vertex</b> veya <b>Alan</b> ölçümü yapabilirsiniz. İlgili butona bastıktan sonra 3D model üzerinde seçim yapmanız yeterlidir. Sonuçlar sağ panelde gösterilir.</p>
+            <p> - <b>👁️‍🗨️ Model Bilgileri:</b> Yüklü modelin dosya adı, vertex/yüzey sayısı gibi temel bilgilerini gösterir.</p>
+
+            <h3 style='color: #2196f3;'>5. Kesit Alma</h3>
+            <p> - <b>✂️ Kesit Düzlemi:</b> Butonuna tıklayarak kesit alma arayüzünü açın.</p>
+            <p> - <b>Eksen ve Konum:</b> X, Y, Z eksenlerinden birini seçin ve slider veya metin kutusu ile kesit düzleminin konumunu ayarlayın.</p>
+            <p> - <b>💾 Kaydet:</b> Mevcut kesiti yeni bir STL dosyası olarak kaydeder ve sahneye yeni bir katman olarak ekler.</p>
+
+            <h3 style='color: #2196f3;'>6. Dosya Dönüştürme</h3>
+            <p> - <b>🔄 Dosya Dönüştür:</b> Menüsü altındaki seçeneklerle modellerinizi GLB, FBX, OBJ, STEP gibi popüler formatlara dönüştürebilirsiniz.</p>
+
+            <h3 style='color: #2196f3;'>7. Diğer Özellikler</h3>
+            <p> - <b>📱 AR'da Görüntüle:</b> Modeli `.glb` formatında seçerek telefonunuzda artırılmış gerçeklikte görüntülemek için bir QR kod oluşturur.</p>
+            <p> - <b>🖨️ 3D Yazıcıya Gönder:</b> Seçili modeli STL formatında dışa aktarır ve varsayılan dilimleme yazılımınızda açar.</p>
+            <p> - <b>📝 Loglar:</b> Uygulamanın çalışma zamanı kayıtlarını (loglarını) gösterir.</p>
+        </div>
+        """
         self.right_content_label.setText(html)
 
     def convert_to_glb(self):
