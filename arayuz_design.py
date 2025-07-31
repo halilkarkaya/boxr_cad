@@ -155,7 +155,6 @@ class MainWindow(QWidget):
         left_frame.setMinimumWidth(220)
         left_frame.setStyleSheet("background-color: #232836; border-radius: 12px;")
 
-        # --- SCROLLABLE PANEL ---
         self.scroll_area = QScrollArea(left_frame)
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setFrameShape(QFrame.NoFrame)
@@ -164,574 +163,531 @@ class MainWindow(QWidget):
         vbox = QVBoxLayout(self.scroll_content)
         vbox.setContentsMargins(16, 16, 16, 16)
         vbox.setSpacing(12)
-        # --- digimode.png logo en üste ---
-        # ---
-        # BOXR CAD yazısı
+
+        # --- BAŞLIKLAR ---
         boxr_label = QLabel("BOXR CAD")
         boxr_label.setFont(QFont("Arial Black", 16, QFont.Bold))
         boxr_label.setAlignment(Qt.AlignCenter)
         boxr_label.setStyleSheet("color: #FFD600; letter-spacing: 3px; margin-bottom: 8px; margin-top: 8px;")
         vbox.addWidget(boxr_label)
-        self.left_panel_labels = [boxr_label]  # Açık tema için başlık ve label'ları sakla
-        # Dosya işlemleri başlığı
+        self.left_panel_labels = [boxr_label]
+
         title = QLabel("Dosya İşlemleri")
         title.setFont(QFont("Arial", 12, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("color: #bfc7e6;")
         vbox.addWidget(title)
         self.left_panel_labels.append(title)
-        # Dosya işlemleri butonları
-        btn_names = [
-            ("➕ Katman Ekle", "➕ Katman Ekle"),
-            ("🔄 Dosya Dönüştür", "🔄 Dosya Dönüştür")
-        ]
 
-        btn_widgets = {}
-        self.left_panel_buttons = []  # Açık tema için sol panel butonlarını sakla
-        for text, name in btn_names:
-            btn = QPushButton(text)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #353b4a;
-                    color: #fff;
-                    border: none;
-                    border-radius: 8px;
-                    padding: 12px 0 12px 18px;
-                    font-size: 17px;
-                    text-align: left;
-                }
-                QPushButton:hover {
-                    background-color: #FFD600;
-                    color: #232836;
-                }
-            """)
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            vbox.addWidget(btn)
-            btn_widgets[name] = btn  # Butonları sözlükte tut
-            self.left_panel_buttons.append(btn)
+        self.left_panel_buttons = []
 
-        # Dönüştürme alt butonları (başta gizli)
+        # --- BUTON STİLLERİ ---
+        main_btn_style = """
+            QPushButton {
+                background-color: #353b4a; color: #fff; border: none; border-radius: 8px;
+                padding: 12px 0 12px 18px; font-size: 17px; text-align: left;
+            }
+            QPushButton:hover { background-color: #FFD600; color: #232836; }
+        """
+        sub_btn_style = """
+            QPushButton {
+                background-color: #444a5a; color: #fff; border: none; border-radius: 8px;
+                padding: 6px 0 6px 32px; font-size: 13px; margin-left: 0px; text-align: left;
+            }
+            QPushButton:hover { background-color: #5a6275; color: #fff; }
+        """
+        
+        # 1. Katman Ekle
+        self.open_btn = QPushButton("➕ Katman Ekle")
+        self.open_btn.setStyleSheet(main_btn_style)
+        self.open_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.open_btn)
+        self.left_panel_buttons.append(self.open_btn)
+
+        # 2. Dosya Dönüştür
+        self.convert_btn = QPushButton("🔄 Dosya Dönüştür")
+        self.convert_btn.setStyleSheet(main_btn_style)
+        self.convert_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.convert_btn)
+        self.left_panel_buttons.append(self.convert_btn)
+        
         self.convert_sub_buttons = []
         convert_options = [
-            ("🟠 GLB'ye Dönüştür", "to_glb"),
-            ("🟣 FBX'e Dönüştür", "to_fbx"),
-            ("🔵 OBJ'ye Dönüştür", "to_obj"),
-            ("🟢 STEP'e Dönüştür", "to_step"),
-            ("🟤 PLY'ye Dönüştür", "to_ply"),
-            ("🟪 GLTF'ye Dönüştür", "to_gltf"),
-            ("🟫 3MF'ye Dönüştür", "to_3mf"),
-            ("🟦 DAE'ye Dönüştür", "to_dae"),
-            ("🟧 STL'ye Dönüştür (STEP/IGES)", "step_to_stl"),
-            ("🟥 OBJ'ye Dönüştür (STEP/IGES)", "step_to_obj")
+            ("🟠 GLB'ye Dönüştür", self.convert_to_glb), ("🟣 FBX'e Dönüştür", self.convert_to_fbx),
+            ("🔵 OBJ'ye Dönüştür", self.convert_to_obj), ("🟢 STEP'e Dönüştür", self.convert_to_step),
+            ("🟤 PLY'ye Dönüştür", self.convert_to_ply), ("🟪 GLTF'ye Dönüştür", self.convert_to_gltf),
+            ("🟫 3MF'ye Dönüştür", self.convert_to_3mf), ("🟦 DAE'ye Dönüştür", self.convert_to_dae),
+            ("🟧 STL'ye Dönüştür (STEP/IGES)", self.convert_step_to_stl), ("🟥 OBJ'ye Dönüştür (STEP/IGES)", self.convert_step_to_obj)
         ]
-        convert_btn_style = """
-            QPushButton {
-                background-color: #353b4a;
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 6px 0 6px 32px;
-                font-size: 13px;
-                margin-left: 0px;
-                text-align: left;
-            }
-            QPushButton:hover {
-                background-color: #444a5a;
-                color: #fff;
-            }
-        """
-        for idx, (text, name) in enumerate(convert_options):
+        for text, func in convert_options:
             sub_btn = QPushButton(text)
-            sub_btn.setStyleSheet(convert_btn_style)
+            sub_btn.setStyleSheet(sub_btn_style)
             sub_btn.setVisible(False)
             sub_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             sub_btn.setFixedHeight(32)
-            sub_btn.setFont(QFont(sub_btn.font().family(), 13))
+            sub_btn.clicked.connect(func)
             vbox.addWidget(sub_btn)
             self.convert_sub_buttons.append(sub_btn)
 
-            # Her butonu kendi özel fonksiyonuna bağla
-            if name == "to_glb":
-                sub_btn.clicked.connect(self.convert_to_glb)
-            elif name == "to_fbx":
-                sub_btn.clicked.connect(self.convert_to_fbx)
-            elif name == "to_obj":
-                sub_btn.clicked.connect(self.convert_to_obj)
-            elif name == "to_step":
-                sub_btn.clicked.connect(self.convert_to_step)
-            elif name == "to_ply":
-                sub_btn.clicked.connect(self.convert_to_ply)
-            elif name == "to_gltf":
-                sub_btn.clicked.connect(self.convert_to_gltf)
-            elif name == "to_3mf":
-                sub_btn.clicked.connect(self.convert_to_3mf)
-            elif name == "to_dae":
-                sub_btn.clicked.connect(self.convert_to_dae)
-            elif name == "step_to_stl":
-                sub_btn.clicked.connect(self.convert_step_to_stl)
-            elif name == "step_to_obj":
-                sub_btn.clicked.connect(self.convert_step_to_obj)
+        # 3. Görünüm Seçenekleri
+        self.view_options_btn = QPushButton("🎨 Görünüm Seçenekleri")
+        self.view_options_btn.setStyleSheet(main_btn_style)
+        self.view_options_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.view_options_btn)
+        self.left_panel_buttons.append(self.view_options_btn)
 
-        # Model Bilgileri butonu
+        self.view_sub_buttons = []
+        view_options = [
+            ("🖼️ Katı Model", lambda: self.occ_widget.set_view_mode('shaded')),
+            ("📉 Tel Kafes", lambda: self.occ_widget.set_view_mode('wireframe'))
+        ]
+        for text, func in view_options:
+            sub_btn = QPushButton(text)
+            sub_btn.setStyleSheet(sub_btn_style)
+            sub_btn.setVisible(False)
+            sub_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            sub_btn.setFixedHeight(32)
+            sub_btn.clicked.connect(func)
+            vbox.addWidget(sub_btn)
+            self.view_sub_buttons.append(sub_btn)
+
+        # 4. Model Bilgileri
         model_info_btn = QPushButton("👁️‍🗨️ Model Bilgileri")
-        model_info_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #353b4a;
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 12px 0 12px 18px;
-                font-size: 17px;
-                text-align: left;
-            }
-            QPushButton:hover {
-                background-color: #FFD600;
-                color: #232836;
-            }
-        """)
+        model_info_btn.setStyleSheet(main_btn_style)
         model_info_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         vbox.addWidget(model_info_btn)
-        model_info_btn.clicked.connect(self.show_model_info_in_panel)
         self.left_panel_buttons.append(model_info_btn)
 
-        # AR'da Görüntüle butonu
-        self.ar_btn = QPushButton("📱 AR'da Görüntüle")
-        self.ar_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #353b4a;
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 12px 0 12px 18px;
-                font-size: 17px;
-                text-align: left;
-            }
-            QPushButton:hover {
-                background-color: #FFD600;
-                color: #232836;
-            }
-        """)
-        self.ar_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.addWidget(self.ar_btn)
-        self.left_panel_buttons.append(self.ar_btn)
-        self.ar_btn.clicked.connect(self.show_ar_preview)
-
-        # Hakkında butonu
-        about_btn = QPushButton("❔ Hakkında")
-        about_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #353b4a;
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 12px 0 12px 18px;
-                font-size: 17px;
-                text-align: left;
-            }
-            QPushButton:hover {
-                background-color: #FFD600;
-                color: #232836;
-            }
-        """)
-        about_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.about_btn_style = about_btn.styleSheet()
-        vbox.addWidget(about_btn)
-        self.left_panel_buttons.append(about_btn)
-        about_btn.clicked.connect(self.show_about_dialog)
-
-        # --- YARDIM / SSS BUTONU ---
-        help_btn = QPushButton("💡 Yardım / SSS")
-        help_btn.setStyleSheet(about_btn.styleSheet())
-        help_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.addWidget(help_btn)
-        self.left_panel_buttons.append(help_btn)
-
-        # Mesafe Ölç butonunu kaldır, yerine Ölçüm Yap ve altına yeni butonlar ekle
-        # Eski mesafe_btn ve ilgili kodlar kaldırıldı
+        # 5. Ölçüm Yap
         self.olcum_btn = QPushButton("📏 Ölçüm Yap")
-        self.olcum_btn.setStyleSheet(about_btn.styleSheet())
+        self.olcum_btn.setStyleSheet(main_btn_style)
         self.olcum_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.insertWidget(vbox.indexOf(about_btn), self.olcum_btn)
-        # Altına üç yeni buton (başta gizli)
+        vbox.addWidget(self.olcum_btn)
+        self.left_panel_buttons.append(self.olcum_btn)
+
         self.olcum_sub_buttons = []
-        olcum_sub_btn_style = """
-            QPushButton {
-                background-color: #444a5a;
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 6px 0 6px 32px;
-                font-size: 13px;
-                margin-left: 0px;
-                text-align: left;
-            }
-            QPushButton:hover {
-                background-color: #FFD600;
-                color: #232836;
-            }
-        """
-        self.kenar_olc_btn = QPushButton("📏 Kenar Ölç")
-        self.kenar_olc_btn.setStyleSheet(olcum_sub_btn_style)
-        self.kenar_olc_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.kenar_olc_btn.setFixedHeight(32)
-        self.kenar_olc_btn.setFont(QFont(self.kenar_olc_btn.font().family(), 13))
-        self.kenar_olc_btn.setVisible(False)
-        vbox.insertWidget(vbox.indexOf(self.olcum_btn)+1, self.kenar_olc_btn)
-        self.olcum_sub_buttons.append(self.kenar_olc_btn)
-        self.left_panel_buttons.append(self.kenar_olc_btn)
-        self.vertex_olc_btn = QPushButton("🟡 Vertex Ölç")
-        self.vertex_olc_btn.setStyleSheet(olcum_sub_btn_style)
-        self.vertex_olc_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.vertex_olc_btn.setFixedHeight(32)
-        self.vertex_olc_btn.setFont(QFont(self.vertex_olc_btn.font().family(), 13))
-        self.vertex_olc_btn.setVisible(False)
-        vbox.insertWidget(vbox.indexOf(self.kenar_olc_btn)+1, self.vertex_olc_btn)
-        self.olcum_sub_buttons.append(self.vertex_olc_btn)
-        self.left_panel_buttons.append(self.vertex_olc_btn)
-        self.alan_olc_btn = QPushButton("🟦 Alan Ölç")
-        self.alan_olc_btn.setStyleSheet(olcum_sub_btn_style)
-        self.alan_olc_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.alan_olc_btn.setFixedHeight(32)
-        self.alan_olc_btn.setFont(QFont(self.alan_olc_btn.font().family(), 13))
-        self.alan_olc_btn.setVisible(False)
-        vbox.insertWidget(vbox.indexOf(self.vertex_olc_btn)+1, self.alan_olc_btn)
-        self.olcum_sub_buttons.append(self.alan_olc_btn)
-        self.left_panel_buttons.append(self.alan_olc_btn)
-        # Ölçüm alt butonlarını aç/kapa fonksiyonu
-        def toggle_olcum_sub_buttons():
-            visible = not self.olcum_sub_buttons[0].isVisible()
-            for b in self.olcum_sub_buttons:
-                b.setVisible(visible)
-        self.olcum_btn.clicked.connect(toggle_olcum_sub_buttons)
+        olcum_options = [
+            ("📏 Kenar Ölç", 'edge', 2), ("🟡 Vertex Ölç", 'vertex', 1), ("🟦 Alan Ölç", 'face', 4)
+        ]
+        for text, measure_type, selection_mode in olcum_options:
+            sub_btn = QPushButton(text)
+            sub_btn.setStyleSheet(sub_btn_style)
+            sub_btn.setVisible(False)
+            sub_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            sub_btn.setFixedHeight(32)
+            sub_btn.clicked.connect(lambda checked, mt=measure_type, sm=selection_mode: self.setup_measurement(mt, sm))
+            vbox.addWidget(sub_btn)
+            self.olcum_sub_buttons.append(sub_btn)
 
-        # Hakkında butonunun üstüne Ortala butonu ekle
-        self.ortala_btn = QPushButton("🎯 Ortala")
-        self.ortala_btn.setStyleSheet(about_btn.styleSheet())
-        self.ortala_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.addWidget(self.ortala_btn)
-        self.left_panel_buttons.append(self.ortala_btn)
-        def ortala_model():
-            if hasattr(self, 'occ_widget') and hasattr(self.occ_widget, 'display'):
-                self.occ_widget.display.FitAll()
-                self.occ_widget.display.Repaint()
-        self.ortala_btn.clicked.connect(ortala_model)
-
-        # Hakkında butonunun üstüne Loglar butonu ekle
-        logs_btn = QPushButton("📝 Loglar")
-        logs_btn.setStyleSheet(about_btn.styleSheet())
-        logs_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.addWidget(logs_btn)
-        self.left_panel_buttons.append(logs_btn)
-        def show_logs():
-            try:
-                with open(log_path, 'r', encoding='utf-8') as f:
-                    log_lines = f.readlines()
-                # Son 'Uygulama başlatıldı.' satırını bul
-                start_idx = 0
-                for i in range(len(log_lines)-1, -1, -1):
-                    if 'Uygulama başlatıldı.' in log_lines[i]:
-                        start_idx = i + 1
-                        break
-                last_logs = log_lines[start_idx:]
-                log_text = ''.join(last_logs)
-                if len(log_text) > 2000:
-                    log_text = log_text[-2000:]
-                html = self.logo_img_html
-                html += f"<div style='font-size:13px; color:#FFD600; background:#232836;'><pre>{log_text}</pre></div>"
-            except Exception as e:
-                html = self.logo_img_html
-                html += f"<span style='color:red;'>Log dosyası okunamadı: {e}</span>"
-            self.right_content_label.setText(html)
-            # Sadece burada log indirme butonunu ekle, başka yerde varsa kaldır
-            if hasattr(self, 'log_download_btn') and self.log_download_btn is not None:
-                self.log_download_btn.setParent(None)
-            from PyQt5.QtWidgets import QPushButton, QFileDialog
-            self.log_download_btn = QPushButton('Tüm Logları İndir')
-            self.log_download_btn.setStyleSheet('background-color:#FFD600; color:#232836; font-weight:bold; border-radius:8px; padding:8px; margin-top:12px;')
-            def download_logs():
-                try:
-                    save_path, _ = QFileDialog.getSaveFileName(self, 'Logları Kaydet', 'uygulama.log', 'Log Dosyası (*.log);;Tüm Dosyalar (*)')
-                    if save_path:
-                        with open(log_path, 'r', encoding='utf-8') as src, open(save_path, 'w', encoding='utf-8') as dst:
-                            dst.write(src.read())
-                except Exception as e:
-                    from PyQt5.QtWidgets import QMessageBox
-                    QMessageBox.warning(self, 'Hata', f'Log dosyası kaydedilemedi: {e}')
-            self.log_download_btn.clicked.connect(download_logs)
-            self.right_top_vbox.addWidget(self.log_download_btn)
-        logs_btn.clicked.connect(show_logs)
-
-        # Dönüştürme alt butonlarını aç/kapa fonksiyonu
-        convert_btn = btn_widgets["🔄 Dosya Dönüştür"]
-        def toggle_sub_buttons():
-            visible = not self.convert_sub_buttons[0].isVisible()
-            for b in self.convert_sub_buttons:
-                b.setVisible(visible)
-        convert_btn.clicked.connect(toggle_sub_buttons)
-
-        # Dosya Aç butonunu instance değişkeni olarak sakla ve fonksiyona bağla
-        self.open_btn = btn_widgets["➕ Katman Ekle"]
-        def katman_ekle_buton_fonksiyonu():
-            dosya_yolu = dosya_secici_ac(parent=self)
-            self.katman_ekle_dosya_yolu(dosya_yolu) # Ana yükleme fonksiyonunu çağır
-        self.open_btn.clicked.connect(katman_ekle_buton_fonksiyonu)
-
-        # --- 3D Yazıcıya Gönder Butonu ---
-        import subprocess
-        import json
-        self.printer_btn = QPushButton("🖨️ 3D Yazıcıya Gönder")
-        self.printer_btn.setStyleSheet(about_btn.styleSheet())
-        self.printer_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.insertWidget(vbox.indexOf(help_btn)+1, self.printer_btn)
-        self.left_panel_buttons.append(self.printer_btn)
-        def send_to_printer():
-            from PyQt5.QtWidgets import QFileDialog, QMessageBox
-            import tempfile, os
-            # Ayar dosyası
-            config_path = os.path.join(os.path.expanduser("~"), ".boxr_cad_printer.json")
-            # Yazıcı yolu ayarlı mı?
-            printer_path = None
-            if os.path.exists(config_path):
-                try:
-                    with open(config_path, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                        printer_path = data.get("printer_path")
-                except Exception:
-                    printer_path = None
-            if not printer_path or not os.path.exists(printer_path):
-                # Her zaman kullanıcıdan doğru exe'yi seçmesini iste
-                while True:
-                    default_cura = r"D:\Yeni klasör (3)\UltiMaker Cura 5.10.1\UltiMaker-Cura.exe"
-                    printer_path, _ = QFileDialog.getOpenFileName(self, "3D Yazıcı Yazılımını Seç (Cura, PrusaSlicer, vs.)", default_cura, "Uygulama (*.exe)")
-                    if not printer_path:
-                        QMessageBox.warning(self, "Yazıcı Yazılımı Gerekli", "3D yazıcı yazılımı seçilmedi.")
-                        return
-                    exe_name = os.path.basename(printer_path).lower()
-                    allowed = ["ultimaker-cura.exe", "cura.exe", "prusa-slicer.exe", "bambustudio.exe", "ideamaker.exe", "photonworkshop.exe", "creality slicer.exe"]
-                    if any(name in exe_name for name in allowed):
-                        break
-                    else:
-                        QMessageBox.warning(self, "Yanlış Dosya", "Lütfen UltiMaker-Cura.exe, Cura.exe, PrusaSlicer.exe veya başka bir dilimleyici programın ana .exe dosyasını seçin. CuraEngine.exe veya benzeri motor dosyalarını seçmeyin.")
-                # Ayar olarak kaydet
-                try:
-                    with open(config_path, "w", encoding="utf-8") as f:
-                        json.dump({"printer_path": printer_path}, f)
-                except Exception:
-                    pass
-            # Aktif katmanın model dosyasını bul
-            idx = self.layer_list.currentRow()
-            if idx < 0 or idx >= len(self.layers):
-                QMessageBox.warning(self, "Uyarı", "Lütfen yazıcıya göndermek için bir katman/model seçin.")
-                return
-            layer = self.layers[idx]
-            # Katmandaki ilk modelin yolunu al
-            model_path = None
-            if "model_refs" in layer and hasattr(self.occ_widget, 'model_path'):
-                model_path = self.occ_widget.model_path
-            if not model_path or not os.path.exists(model_path):
-                QMessageBox.warning(self, "Hata", "Model dosyası bulunamadı.")
-                return
-            # STL olarak geçici kaydet
-            import trimesh
-            temp_dir = tempfile.gettempdir()
-            temp_stl = os.path.join(temp_dir, f"boxr_cad_export_{idx}.stl")
-            try:
-                mesh = trimesh.load(model_path, force='mesh')
-                mesh.export(temp_stl, file_type='stl')
-            except Exception as e:
-                QMessageBox.warning(self, "Hata", f"STL dosyası oluşturulamadı: {e}")
-                return
-            # STL dosyasını varsayılan programda aç
-            try:
-                import os
-                os.startfile(temp_stl)
-            except Exception as e:
-                QMessageBox.warning(self, "Hata", f"STL dosyası varsayılan programda açılamadı: {e}")
-                return
-            QMessageBox.information(self, "Başarılı", "Model STL dosyası olarak kaydedildi ve varsayılan 3D yazıcı yazılımında açıldı. Eğer açılmazsa STL dosyasını elle açabilirsiniz: " + temp_stl)
-        self.printer_btn.clicked.connect(send_to_printer)
-
-        # --- Kesit Düzlemi Arayüzü ---
+        # 6. Kesit Düzlemi
         self.section_btn = QPushButton("✂️ Kesit Düzlemi")
-        self.section_btn.setStyleSheet(about_btn.styleSheet())
+        self.section_btn.setStyleSheet(main_btn_style)
         self.section_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         vbox.addWidget(self.section_btn)
-        # Eksen seçici
-        self.section_axis = QComboBox()
-        self.section_axis.addItems(["Z", "Y", "X"])
-        self.section_axis.setVisible(False)
-        vbox.addWidget(self.section_axis)
-        # Slider
+        self.left_panel_buttons.append(self.section_btn)
+
+        # --- Kesit Alma GroupBox ---
+        self.section_group_box = QGroupBox("Kesit Kontrol")
+        self.section_group_box.setStyleSheet("""
+            QGroupBox {
+                color: #FFD600;
+                font-size: 14px;
+                font-weight: bold;
+                border: 1px solid #353b4a;
+                border-radius: 8px;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top center;
+                padding: 0 5px;
+            }
+        """)
+        section_layout = QVBoxLayout()
+        section_layout.setSpacing(8)
+        section_layout.setContentsMargins(10, 20, 10, 10)
+
+        # Eksen seçimi için Radio Butonlar
+        axis_layout = QHBoxLayout()
+        self.section_axis_group = QButtonGroup(self)
+        self.z_radio = QRadioButton("Z")
+        self.y_radio = QRadioButton("Y")
+        self.x_radio = QRadioButton("X")
+        self.z_radio.setChecked(True)
+        self.z_radio.setStyleSheet("color: #fff;")
+        self.y_radio.setStyleSheet("color: #fff;")
+        self.x_radio.setStyleSheet("color: #fff;")
+        self.section_axis_group.addButton(self.z_radio)
+        self.section_axis_group.addButton(self.y_radio)
+        self.section_axis_group.addButton(self.x_radio)
+        axis_label = QLabel("Eksen:")
+        axis_label.setStyleSheet("color: #fff;")
+        axis_layout.addWidget(axis_label)
+        axis_layout.addStretch()
+        axis_layout.addWidget(self.z_radio)
+        axis_layout.addWidget(self.y_radio)
+        axis_layout.addWidget(self.x_radio)
+        section_layout.addLayout(axis_layout)
+
+        # Konum Slider'ı
         self.section_slider = QSlider(Qt.Horizontal)
         self.section_slider.setMinimum(-100)
         self.section_slider.setMaximum(100)
         self.section_slider.setValue(0)
-        self.section_slider.setVisible(False)
-        vbox.addWidget(self.section_slider)
-        # Label
-        self.section_label = QLabel("Düzlem Konumu: 0")
-        self.section_label.setStyleSheet("color:#FFD600; font-size:13px;")
-        self.section_label.setVisible(False)
-        vbox.addWidget(self.section_label)
-        # --- KESİTİ KAYDET BUTONU ---
-        self.save_section_btn = QPushButton("💾 Kesiti Kaydet")
-        self.save_section_btn.setStyleSheet(about_btn.styleSheet())
-        self.save_section_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.save_section_btn.setVisible(False)
-        vbox.addWidget(self.save_section_btn)
-        # OCC tarafı: clip_plane referansı
-        self.clip_plane = None
-        def toggle_section():
-            if self.section_slider.isVisible():
-                # Kapat
-                self.section_slider.setVisible(False)
-                self.section_axis.setVisible(False)
-                self.section_label.setVisible(False)
-                self.save_section_btn.setVisible(False)
-                self.section_btn.setText("✂️ Kesit Düzlemi")
-                # OCC: clip_plane kaldır
-                try:
-                    if self.clip_plane is not None:
-                        self.occ_widget.display.View.RemoveClipPlane(self.clip_plane)
-                        self.occ_widget.display.View.Redraw()
-                        self.clip_plane = None
-                except Exception:
-                    pass
-            else:
-                # Aç
-                self.section_slider.setVisible(True)
-                self.section_axis.setVisible(True)
-                self.section_label.setVisible(True)
-                self.save_section_btn.setVisible(True)
-                self.section_btn.setText("❌ Kesiti Kapat")
-                # OCC: clip_plane oluştur
-                try:
-                    from OCC.Core.gp import gp_Pln, gp_Pnt, gp_Dir
-                    from OCC.Core.Graphic3d import Graphic3d_ClipPlane
-                    axis = self.section_axis.currentText()
-                    pos = self.section_slider.value()
-                    if axis == "Z":
-                        origin = gp_Pnt(0, 0, pos)
-                        normal = gp_Dir(0, 0, 1)
-                    elif axis == "Y":
-                        origin = gp_Pnt(0, pos, 0)
-                        normal = gp_Dir(0, 1, 0)
-                    else:
-                        origin = gp_Pnt(pos, 0, 0)
-                        normal = gp_Dir(1, 0, 0)
-                    plane = gp_Pln(origin, normal)
-                    self.clip_plane = Graphic3d_ClipPlane(plane)
-                    self.occ_widget.display.View.AddClipPlane(self.clip_plane)
-                    self.occ_widget.display.View.Redraw()
-                except Exception as e:
-                    print("Kesit düzlemi hatası:", e)
-        self.section_btn.clicked.connect(toggle_section)
-        def update_section():
-            # Slider veya eksen değiştiğinde düzlemi güncelle
-            self.section_label.setText(f"Düzlem Konumu: {self.section_slider.value()}")
-            if self.clip_plane is not None:
-                try:
-                    from OCC.Core.gp import gp_Pln, gp_Pnt, gp_Dir
-                    axis = self.section_axis.currentText()
-                    pos = self.section_slider.value()
-                    if axis == "Z":
-                        origin = gp_Pnt(0, 0, pos)
-                        normal = gp_Dir(0, 0, 1)
-                    elif axis == "Y":
-                        origin = gp_Pnt(0, pos, 0)
-                        normal = gp_Dir(0, 1, 0)
-                    else:
-                        origin = gp_Pnt(pos, 0, 0)
-                        normal = gp_Dir(1, 0, 0)
-                    plane = gp_Pln(origin, normal)
-                    self.clip_plane.SetEquation(plane)
-                    self.occ_widget.display.View.Redraw()
-                except Exception as e:
-                    print("Kesit düzlemi güncelleme hatası:", e)
-        self.section_slider.valueChanged.connect(update_section)
-        self.section_axis.currentIndexChanged.connect(update_section)
-        # --- KESİTİ KAYDET BUTONU FONKSİYONU ---
-        def save_section():
-            if self.clip_plane is None:
-                QMessageBox.warning(self, "Uyarı", "Önce bir kesit düzlemi oluşturmalısınız!")
-                return
-            # Seçili katmanın modelini al
-            def get_selected_layer_model_refs():
-                idx = self.layer_list.currentRow()
-                if idx < 0 or idx >= len(self.layers):
-                    QMessageBox.warning(self, "Uyarı", "Lütfen önce bir katman seçin.")
-                    return None
-                return self.layers[idx]["model_refs"]
-            model_refs = get_selected_layer_model_refs()
-            if not model_refs:
-                return
-            model_ref = model_refs[0]  # Katmandaki ilk model
-            # Modelin shape'ini al
-            model_shape = None
-            if hasattr(self.occ_widget, 'get_active_shape') and hasattr(model_ref, 'Shape'):
-                model_shape = model_ref.Shape()
-            if model_shape is None:
-                QMessageBox.warning(self, "Uyarı", "Seçili katmanın geçerli bir modeli yok!")
-                return
-            try:
-                from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
-                from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
-                from OCC.Core.StlAPI import StlAPI_Writer
-                from OCC.Core.gp import gp_Pln, gp_Pnt, gp_Dir
-                # Düzlemi oluştur
-                axis = self.section_axis.currentText()
-                pos = self.section_slider.value()
-                if axis == "Z":
-                    origin = gp_Pnt(0, 0, pos)
-                    normal = gp_Dir(0, 0, 1)
-                elif axis == "Y":
-                    origin = gp_Pnt(0, pos, 0)
-                    normal = gp_Dir(0, 1, 0)
-                else:
-                    origin = gp_Pnt(pos, 0, 0)
-                    normal = gp_Dir(1, 0, 0)
-                plane = gp_Pln(origin, normal)
-                from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace
-                face = BRepBuilderAPI_MakeFace(plane, -1000, 1000, -1000, 1000).Face()
-                # Modeli düzlemle kes (cut)
-                cut = BRepAlgoAPI_Cut(model_shape, face)
-                cut_shape = cut.Shape()
-                # STL olarak kaydet
-                file_path, _ = QFileDialog.getSaveFileName(self, "Kesiti STL Olarak Kaydet", "kesit.stl", "STL Dosyası (*.stl)")
-                if not file_path:
-                    return
-                # Meshle
-                mesh = BRepMesh_IncrementalMesh(cut_shape, 0.1)
-                mesh.Perform()
-                # Yaz
-                writer = StlAPI_Writer()
-                writer.Write(cut_shape, file_path)
-                # --- KESİTİ YENİ KATMAN OLARAK EKLE ---
-                stl_path = file_path
-                layer_name = f"Kesit Katmanı {len(self.layers)+1}"
-                model_ref = self.occ_widget.add_model(stl_path, model_path=stl_path)
-                layer = {"name": layer_name, "visible": True, "model_refs": [model_ref]}
-                self.layers.append(layer)
-                # Katman paneline ekle
-                def add_layer_item():
-                    item = QListWidgetItem(layer_name)
-                    item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-                    item.setCheckState(Qt.Checked)
-                    self.layer_list.addItem(item)
-                QTimer.singleShot(0, add_layer_item)
-                QMessageBox.information(self, "Başarılı", f"Kesit STL olarak kaydedildi ve yeni katman olarak eklendi!\n{file_path}")
-            except Exception as e:
-                QMessageBox.critical(self, "Hata", f"Kesit kaydedilemedi:\n{e}")
-        self.save_section_btn.clicked.connect(save_section)
+        section_layout.addWidget(self.section_slider)
 
-        # Sol panelde (create_left_panel) vbox.addStretch() en sona taşınacak
+        # Konum Değeri ve Etiketi
+        pos_layout = QHBoxLayout()
+        self.section_label = QLabel("Konum: 0")
+        self.section_label.setStyleSheet("color:#FFD600; font-size:13px;")
+        self.section_pos_edit = QLineEdit("0")
+        self.section_pos_edit.setFixedWidth(50)
+        self.section_pos_edit.setStyleSheet("color: #fff; background-color: #353b4a; border-radius: 4px; padding: 2px;")
+        pos_layout.addWidget(self.section_label)
+        pos_layout.addStretch()
+        pos_layout.addWidget(self.section_pos_edit)
+        section_layout.addLayout(pos_layout)
+
+        # Kaydet ve Kapat Butonları
+        section_btn_layout = QHBoxLayout()
+        self.save_section_btn = QPushButton("💾 Kaydet")
+        self.close_section_btn = QPushButton("❌ Kapat")
+        self.save_section_btn.setStyleSheet(sub_btn_style)
+        self.close_section_btn.setStyleSheet(sub_btn_style)
+        section_btn_layout.addWidget(self.save_section_btn)
+        section_btn_layout.addWidget(self.close_section_btn)
+        section_layout.addLayout(section_btn_layout)
+
+        self.section_group_box.setLayout(section_layout)
+        self.section_group_box.setVisible(False)
+        vbox.addWidget(self.section_group_box)
+
+        # 7. Ortala
+        self.ortala_btn = QPushButton("🎯 Ortala")
+        self.ortala_btn.setStyleSheet(main_btn_style)
+        self.ortala_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.ortala_btn)
+        self.left_panel_buttons.append(self.ortala_btn)
+
+        # 8. AR'da Görüntüle
+        self.ar_btn = QPushButton("📱 AR'da Görüntüle")
+        self.ar_btn.setStyleSheet(main_btn_style)
+        self.ar_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.ar_btn)
+        self.left_panel_buttons.append(self.ar_btn)
+
+        # 9. 3D Yazıcıya Gönder
+        self.printer_btn = QPushButton("🖨️ 3D Yazıcıya Gönder")
+        self.printer_btn.setStyleSheet(main_btn_style)
+        self.printer_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.printer_btn)
+        self.left_panel_buttons.append(self.printer_btn)
+
+        # 10. Loglar
+        logs_btn = QPushButton("📝 Loglar")
+        logs_btn.setStyleSheet(main_btn_style)
+        logs_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(logs_btn)
+        self.left_panel_buttons.append(logs_btn)
+
+        # 11. Yardım / SSS
+        help_btn = QPushButton("💡 Yardım / SSS")
+        help_btn.setStyleSheet(main_btn_style)
+        help_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(help_btn)
+        self.left_panel_buttons.append(help_btn)
+
+        # 12. Hakkında
+        about_btn = QPushButton("❔ Hakkında")
+        about_btn.setStyleSheet(main_btn_style)
+        about_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(about_btn)
+        self.left_panel_buttons.append(about_btn)
+        self.about_btn_style = about_btn.styleSheet() # Stili sakla
+
         vbox.addStretch()
         self.scroll_area.setWidget(self.scroll_content)
         layout = QVBoxLayout(left_frame)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.addWidget(self.scroll_area)
-        return left_frame 
+
+        # --- BUTON FONKSİYONLARI ---
+        self.open_btn.clicked.connect(lambda: self.katman_ekle_dosya_yolu(dosya_secici_ac(parent=self)))
+        self.convert_btn.clicked.connect(lambda: self.toggle_sub_menu(self.convert_sub_buttons))
+        self.view_options_btn.clicked.connect(lambda: self.toggle_sub_menu(self.view_sub_buttons))
+        model_info_btn.clicked.connect(self.show_model_info_in_panel)
+        self.olcum_btn.clicked.connect(lambda: self.toggle_sub_menu(self.olcum_sub_buttons))
+        self.section_btn.clicked.connect(self.toggle_section_ui)
+        self.ortala_btn.clicked.connect(lambda: self.occ_widget.display.FitAll())
+        self.ar_btn.clicked.connect(self.show_ar_preview)
+        self.printer_btn.clicked.connect(self.send_to_printer)
+        logs_btn.clicked.connect(self.show_logs)
+        about_btn.clicked.connect(self.show_about_dialog)
+
+        # Yeni Kesit Arayüzü Bağlantıları
+        self.close_section_btn.clicked.connect(self.toggle_section_ui)
+        self.save_section_btn.clicked.connect(self.save_section)
+        self.section_slider.valueChanged.connect(self.update_section_from_slider)
+        self.section_pos_edit.textChanged.connect(self.update_section_from_lineedit)
+        self.z_radio.toggled.connect(self.update_section)
+        self.y_radio.toggled.connect(self.update_section)
+        self.x_radio.toggled.connect(self.update_section)
+
+        return left_frame
+
+    def toggle_sub_menu(self, sub_buttons):
+        visible = not sub_buttons[0].isVisible()
+        for btn in sub_buttons:
+            btn.setVisible(visible)
+
+    def setup_measurement(self, measure_type, selection_mode):
+        self.occ_widget.active_measure = measure_type
+        self.occ_widget.set_selection_mode(selection_mode)
+        self.occ_widget.set_measure_mode(True)
+        self.right_content_label.setText(f'<div style="color:#FFD600; font-size:16px;">Lütfen bir {measure_type} seçin.</div>')
+
+    def toggle_section_ui(self):
+        visible = not self.section_group_box.isVisible()
+        self.section_group_box.setVisible(visible)
+        self.section_btn.setText("❌ Kesiti Kapat" if visible else "✂️ Kesit Düzlemi")
+
+        if visible:
+            if not hasattr(self, 'clip_plane') or self.clip_plane is None:
+                from OCC.Core.gp import gp_Pln, gp_Pnt, gp_Dir
+                from OCC.Core.Graphic3d import Graphic3d_ClipPlane
+                plane = gp_Pln(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1))
+                self.clip_plane = Graphic3d_ClipPlane(plane)
+                self.occ_widget.display.View.AddClipPlane(self.clip_plane)
+            self.update_section()
+        else:
+            if hasattr(self, 'clip_plane') and self.clip_plane is not None:
+                self.occ_widget.display.View.RemoveClipPlane(self.clip_plane)
+                self.clip_plane = None
+                self.occ_widget.display.View.Redraw()
+
+    def update_section_from_slider(self, value):
+        self.section_pos_edit.blockSignals(True)
+        self.section_pos_edit.setText(str(value))
+        self.section_pos_edit.blockSignals(False)
+        self.update_section()
+
+    def update_section_from_lineedit(self, text):
+        try:
+            val = int(text)
+            self.section_slider.blockSignals(True)
+            self.section_slider.setValue(val)
+            self.section_slider.blockSignals(False)
+            self.update_section()
+        except (ValueError, TypeError):
+            pass # Ignore non-integer input
+
+    def update_section(self):
+        if not self.section_group_box.isVisible() or not hasattr(self, 'clip_plane') or self.clip_plane is None:
+            return
+
+        from OCC.Core.gp import gp_Pln, gp_Pnt, gp_Dir
+
+        pos = self.section_slider.value()
+        self.section_label.setText(f"Konum: {pos}")
+        
+        axis_btn = self.section_axis_group.checkedButton()
+        if not axis_btn: # Return if no button is checked yet
+            return
+        axis = axis_btn.text()
+
+        if axis == "Z":
+            normal = gp_Dir(0, 0, 1)
+            origin = gp_Pnt(0, 0, pos)
+        elif axis == "Y":
+            normal = gp_Dir(0, 1, 0)
+            origin = gp_Pnt(0, pos, 0)
+        else: # X
+            normal = gp_Dir(1, 0, 0)
+            origin = gp_Pnt(pos, 0, 0)
+        
+        plane = gp_Pln(origin, normal)
+        self.clip_plane.SetEquation(plane)
+        self.occ_widget.display.View.Redraw()
+
+    def save_section(self):
+        if not hasattr(self, 'clip_plane') or self.clip_plane is None:
+            QMessageBox.warning(self, "Uyarı", "Önce bir kesit düzlemi oluşturmalısınız!")
+            return
+
+        # Seçili katmanın modelini al
+        selected_items = self.layer_list.selectedItems()
+        if not selected_items:
+            QMessageBox.warning(self, "Uyarı", "Lütfen önce bir katman seçin.")
+            return
+        idx = self.layer_list.row(selected_items[0])
+        model_refs = self.layers[idx]["model_refs"]
+        
+        if not model_refs:
+            return
+
+        model_ref = model_refs[0]  # Katmandaki ilk model
+        model_shape = self.occ_widget.get_shape_from_ref(model_ref)
+
+        if model_shape is None:
+            QMessageBox.warning(self, "Uyarı", "Seçili katmanın geçerli bir modeli (shape) yok!")
+            return
+
+        try:
+            from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Common
+            from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeHalfSpace
+            from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace
+            from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
+            from OCC.Core.StlAPI import StlAPI_Writer
+            from OCC.Core.gp import gp_Pln, gp_Pnt, gp_Dir, gp_Vec
+
+            # Düzlemi UI'dan al
+            axis_btn = self.section_axis_group.checkedButton()
+            if not axis_btn:
+                QMessageBox.warning(self, "Hata", "Kesit ekseni seçilmemiş.")
+                return
+            axis = axis_btn.text()
+            pos = self.section_slider.value()
+
+            if axis == "Z":
+                origin = gp_Pnt(0, 0, pos)
+                normal = gp_Dir(0, 0, 1)
+            elif axis == "Y":
+                origin = gp_Pnt(0, pos, 0)
+                normal = gp_Dir(0, 1, 0)
+            else: # X
+                origin = gp_Pnt(pos, 0, 0)
+                normal = gp_Dir(1, 0, 0)
+            
+            plane = gp_Pln(origin, normal)
+            face = BRepBuilderAPI_MakeFace(plane, -10000, 10000, -10000, 10000).Face()
+
+            # Düzlemin negatif tarafında bir yarım uzay (HalfSpace) oluştur
+            # Bu, kesitin "korunacak" tarafını temsil eder
+            reversed_vec = gp_Vec(normal.Reversed().XYZ())
+            scaled_vec = reversed_vec.Multiplied(10000) # Scale the vector
+            point_on_solid_side = origin.Translated(scaled_vec)
+            half_space = BRepPrimAPI_MakeHalfSpace(face, point_on_solid_side).Solid()
+
+            # Orijinal model ile yarım uzayın kesişimini (ortak bölümünü) al
+            intersection = BRepAlgoAPI_Common(model_shape, half_space)
+            cut_shape = intersection.Shape()
+
+            if cut_shape.IsNull():
+                QMessageBox.warning(self, "Hata", "Kesit oluşturulamadı. Model ve düzlem kesişmiyor olabilir.")
+                return
+
+            # STL olarak kaydetmek için dosya yolu al
+            file_path, _ = QFileDialog.getSaveFileName(self, "Kesiti STL Olarak Kaydet", "kesit.stl", "STL Dosyası (*.stl)")
+            if not file_path:
+                return
+
+            # Mesh oluştur ve STL dosyasına yaz
+            mesh = BRepMesh_IncrementalMesh(cut_shape, 0.1, True)
+            mesh.Perform()
+            if not mesh.IsDone():
+                 QMessageBox.warning(self, "Hata", "Kesitli model meshlenemedi.")
+                 return
+
+            writer = StlAPI_Writer()
+            writer.SetASCIIMode(True) # ASCII formatında kaydet
+            if not writer.Write(cut_shape, file_path):
+                QMessageBox.critical(self, "Hata", f"Kesit dosyası yazılamadı: {file_path}")
+                return
+
+            # --- KESİTİ YENİ KATMAN OLARAK EKLE ---
+            layer_name = f"Kesit - {os.path.basename(file_path)}"
+            new_model_ref = self.occ_widget.add_model(file_path, model_path=file_path)
+            if new_model_ref:
+                layer = {"name": layer_name, "visible": True, "model_refs": [new_model_ref], "model_path": file_path}
+                self.layers.append(layer)
+                
+                item = QListWidgetItem(layer_name)
+                item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+                item.setCheckState(Qt.Checked)
+                self.layer_list.addItem(item)
+                self.layer_list.setCurrentRow(self.layer_list.count() - 1)
+
+                QMessageBox.information(self, "Başarılı", f"Kesit başarıyla kaydedildi ve yeni katman olarak eklendi!\n{file_path}")
+            else:
+                QMessageBox.warning(self, "Uyarı", "Kesit kaydedildi ancak yeni katman olarak eklenemedi.")
+
+        except Exception as e:
+            logging.error(f"Kesit kaydedilirken hata: {e}", exc_info=True)
+            QMessageBox.critical(self, "Kritik Hata", f"Kesit kaydedilemedi:\n{e}")
+
+    def send_to_printer(self):
+        from PyQt5.QtWidgets import QFileDialog, QMessageBox
+        import tempfile, os, json
+
+        config_path = os.path.join(os.path.expanduser("~"), ".boxr_cad_printer.json")
+        printer_path = None
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, "r", encoding="utf-8") as f:
+                    printer_path = json.load(f).get("printer_path")
+            except Exception: pass
+
+        if not printer_path or not os.path.exists(printer_path):
+            default_cura = r"D:\Yeni klasör (3)\UltiMaker Cura 5.10.1\UltiMaker-Cura.exe"
+            printer_path, _ = QFileDialog.getOpenFileName(self, "3D Yazıcı Yazılımını Seç", default_cura, "Uygulama (*.exe)")
+            if not printer_path:
+                QMessageBox.warning(self, "Yazıcı Yazılımı Gerekli", "3D yazıcı yazılımı seçilmedi.")
+                return
+            try:
+                with open(config_path, "w", encoding="utf-8") as f:
+                    json.dump({"printer_path": printer_path}, f)
+            except Exception: pass
+        
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen yazıcıya göndermek için bir katman/model seçin.")
+            return
+        
+        model_path = self.layers[idx].get("model_path")
+        if not model_path or not os.path.exists(model_path):
+            QMessageBox.warning(self, "Hata", "Model dosyası bulunamadı.")
+            return
+
+        try:
+            import trimesh
+            temp_stl = os.path.join(tempfile.gettempdir(), f"boxr_cad_export_{idx}.stl")
+            mesh = trimesh.load(model_path, force='mesh')
+            mesh.export(temp_stl, file_type='stl')
+            os.startfile(temp_stl)
+            QMessageBox.information(self, "Başarılı", f"Model STL olarak dışa aktarıldı ve varsayılan yazılımda açıldı: {temp_stl}")
+        except Exception as e:
+            QMessageBox.warning(self, "Hata", f"Model dışa aktarılamadı: {e}")
+
+    def show_logs(self):
+        self.right_frame.setVisible(True)
+        try:
+            with open(log_path, 'r', encoding='utf-8') as f:
+                log_text = ''.join(f.readlines()[-100:]) # Son 100 satır
+            html = self.logo_img_html + f"<div style='font-size:13px; color:#FFD600; background:#232836;'><pre>{log_text}</pre></div>"
+        except Exception as e:
+            html = self.logo_img_html + f"<span style='color:red;'>Log dosyası okunamadı: {e}</span>"
+        
+        self.right_content_label.setText(html)
+        if not hasattr(self, 'log_download_btn'):
+            self.log_download_btn = QPushButton('Tüm Logları İndir')
+            self.log_download_btn.setStyleSheet('background-color:#FFD600; color:#232836; font-weight:bold; border-radius:8px; padding:8px; margin-top:12px;')
+            self.log_download_btn.clicked.connect(self.download_logs)
+            self.right_top_vbox.addWidget(self.log_download_btn)
+        self.log_download_btn.setVisible(True)
+
+    def hide_log_download_button(self):
+        if hasattr(self, 'log_download_btn'):
+            self.log_download_btn.setVisible(False)
+
+    def download_logs(self):
+        try:
+            save_path, _ = QFileDialog.getSaveFileName(self, 'Logları Kaydet', 'uygulama.log', 'Log Dosyası (*.log);;Tüm Dosyalar (*)')
+            if save_path:
+                import shutil
+                shutil.copy(log_path, save_path)
+        except Exception as e:
+            QMessageBox.warning(self, 'Hata', f'Log dosyası kaydedilemedi: {e}') 
 
     ## \brief Orta paneli (3D model görüntüleme alanı) oluşturur.
     #  \return QWidget orta panel
@@ -1025,25 +981,7 @@ class MainWindow(QWidget):
                 self.layer_list.takeItem(idx)
         self.layer_list.customContextMenuRequested.connect(katman_context_menu)
 
-        # Ölçüm alt butonlarına (Kenar Ölç, Vertex Ölç, Alan Ölç) tıklandığında seçim modunu değiştir (kenar:2, vertex:1, yüzey:4).
-        self.kenar_olc_btn.clicked.connect(lambda: (
-    setattr(self.occ_widget, 'active_measure', 'edge'),
-    self.occ_widget.set_selection_mode(2),
-    self.occ_widget.set_measure_mode(True),
-    self.right_content_label.setText('<div style="color:#FFD600; font-size:16px;">Bir kenar seçin, seçtiğiniz kenarın özellikleri burada gözükecek.</div>')
-))
-        self.vertex_olc_btn.clicked.connect(lambda: (
-    setattr(self.occ_widget, 'active_measure', 'vertex'),
-    self.occ_widget.set_selection_mode(1),
-    self.occ_widget.set_measure_mode(True),
-    self.right_content_label.setText('<div style="color:#FFD600; font-size:16px;">Bir vertex seçin, tüm bilgileri burada gözükecek.</div>')
-))
-        self.alan_olc_btn.clicked.connect(lambda: (
-    setattr(self.occ_widget, 'active_measure', 'face'),
-    self.occ_widget.set_selection_mode(4),
-    self.occ_widget.set_measure_mode(True),
-    self.right_content_label.setText('<div style="color:#FFD600; font-size:16px;">Bir yüzey seçin, tüm bilgileri burada gözükecek.</div>')
-))
+        
         # 2 Nokta Mesafe butonunu ve bağlantılarını kaldır
         # self.mesafe_btn = QPushButton("🔴 2 Nokta Mesafe")
         # self.mesafe_btn.setStyleSheet(olcum_sub_btn_style)
@@ -1432,20 +1370,9 @@ class MainWindow(QWidget):
 
     def show_about_dialog(self):
         """Hakkında penceresini gösterir."""
-        html = self.logo_img_html + \
-            "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>" \
-            "<p><b>Versiyon:</b> 1.0.0</p>" \
-            "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>" \
-            "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>" \
-            "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>" \
-            "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>" \
-            "<li style='margin-bottom:2px;'>STL (.stl)</li>" \
-            "<li style='margin-bottom:2px;'>FBX (.fbx)</li>" \
-            "<li style='margin-bottom:2px;'>GLB (.glb)</li>" \
-            "<li style='margin-bottom:2px;'>OBJ (.obj)</li>" \
-            "</ul>" \
-            "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>" \
-            "</div>"
+        self.right_frame.setVisible(True)
+        self.hide_log_download_button()
+        html = self.logo_img_html +             "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>"             "<p><b>Versiyon:</b> 1.0.0</p>"             "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>"             "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>"             "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>"             "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>"             "<li style='margin-bottom:2px;'>STL (.stl)</li>"             "<li style='margin-bottom:2px;'>FBX (.fbx)</li>"             "<li style='margin-bottom:2px;'>GLB (.glb)</li>"             "<li style='margin-bottom:2px;'>OBJ (.obj)</li>"             "</ul>"             "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>"             "</div>"
         self.right_content_label.setText(html)
 
     def convert_to_glb(self):
@@ -1480,6 +1407,8 @@ class MainWindow(QWidget):
 
     def show_model_info_in_panel(self):
         """Sağ panelde mevcut modelin bilgilerini gösterir."""
+        self.right_frame.setVisible(True)
+        self.hide_log_download_button()
         if hasattr(self, 'right_content_label'):
             info = self.occ_widget.get_model_info()
             html = self.logo_img_html
@@ -1488,18 +1417,11 @@ class MainWindow(QWidget):
                 html += f"<b>{k}:</b> {v}<br>"
             html += "</div>"
             self.right_content_label.setText(html)
-            # Log indirme butonunu da kaldır
-            if hasattr(self, 'log_download_btn') and self.log_download_btn is not None:
-                self.log_download_btn.setParent(None)
-                self.log_download_btn = None
 
     def show_shape_info_in_panel(self, info, title=None, is_html=False):
+        self.hide_log_download_button()
         if is_html:
             self.right_content_label.setText(info)
-            # Log indirme butonunu kaldır
-            if hasattr(self, 'log_download_btn') and self.log_download_btn is not None:
-                self.log_download_btn.setParent(None)
-                self.log_download_btn = None
             return
         # Ölçüm sonucu ise, paneli tamamen temizle ve sadece ölçüm detaylarını göster
         if title is not None:
@@ -1513,10 +1435,6 @@ class MainWindow(QWidget):
                     html += f"<b>{k}:</b> {v}<br>"
             html += '</div>'
             self.right_content_label.setText(html)
-            # Log indirme butonunu kaldır
-            if hasattr(self, 'log_download_btn') and self.log_download_btn is not None:
-                self.log_download_btn.setParent(None)
-                self.log_download_btn = None
             return
         html = "<div style='font-size:15px; color:#bfc7e6;'><b>Seçili Özellikler:</b><br>"
         # Öncelikli anahtarlar sırası
@@ -1547,12 +1465,3 @@ class MainWindow(QWidget):
                 html += f"<b>{k}:</b> {v}<br>"
         html += "</div>"
         self.right_content_label.setText(html)
-        # Log indirme butonunu kaldır
-        if hasattr(self, 'log_download_btn') and self.log_download_btn is not None:
-            self.log_download_btn.setParent(None)
-            self.log_download_btn = None
-   
-    
-
-    
-

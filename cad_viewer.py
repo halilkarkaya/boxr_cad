@@ -80,7 +80,7 @@ class OCCModelWidget(QWidget):
         # 3D Grid (Graduated Trihedron)
         try:
             view = self.display.View
-            view.GraduatedTrihedronDisplay(True, True)
+            view.GraduatedTrihedronDisplay(True)
         except Exception as e:
             print('Grid display error:', e)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -741,6 +741,18 @@ class OCCModelWidget(QWidget):
             self.display.Context.Activate(model_ref, mode)
         self.display.Context.UpdateCurrentViewer()
 
+    def set_view_mode(self, mode):
+        """Changes the display mode for all models in the scene.
+        :param mode: 'shaded' or 'wireframe'
+        """
+        # In OCC, 0 is wireframe, 1 is shaded
+        display_mode = 1 if mode == 'shaded' else 0
+        if not self.models:
+            return
+        for model_ref in self.models:
+            self.display.Context.SetDisplayMode(model_ref, display_mode, False)
+        self.display.Context.UpdateCurrentViewer()
+
     def set_sky_background(self):
         try:
             from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
@@ -748,6 +760,14 @@ class OCCModelWidget(QWidget):
             self.display.Repaint()
         except Exception as e:
             print('Arka plan düz maviye ayarlanamadı:', e)
+
+    def get_shape_from_ref(self, model_ref):
+        """
+        Retrieves the underlying TopoDS_Shape from an AIS_Shape reference.
+        """
+        if model_ref is not None and hasattr(model_ref, 'Shape'):
+            return model_ref.Shape()
+        return None
 
     def get_active_shape(self):
         """Yüklü modelin TopoDS_Shape nesnesini döndürür."""
