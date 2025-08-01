@@ -362,12 +362,7 @@ class MainWindow(QWidget):
         self.section_group_box.setVisible(False)
         vbox.addWidget(self.section_group_box)
 
-        # 7. Ortala
-        self.ortala_btn = QPushButton("🎯 Ortala")
-        self.ortala_btn.setStyleSheet(main_btn_style)
-        self.ortala_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.addWidget(self.ortala_btn)
-        self.left_panel_buttons.append(self.ortala_btn)
+        
 
         # 8. AR'da Görüntüle
         self.ar_btn = QPushButton("📱 AR'da Görüntüle")
@@ -439,7 +434,6 @@ class MainWindow(QWidget):
         model_info_btn.clicked.connect(self.show_model_info_in_panel)
         self.olcum_btn.clicked.connect(lambda: self.toggle_sub_menu(self.olcum_sub_buttons))
         self.section_btn.clicked.connect(self.toggle_section_ui)
-        self.ortala_btn.clicked.connect(lambda: self.occ_widget.display.FitAll())
         self.ar_btn.clicked.connect(self.show_ar_preview)
         self.printer_main_btn.clicked.connect(lambda: self.toggle_sub_menu(self.printer_sub_buttons))
         self.send_to_printer_btn.clicked.connect(self.send_to_printer)
@@ -880,6 +874,13 @@ class MainWindow(QWidget):
                     self.occ_widget.display.View.SetBackgroundColor(Quantity_Color(r, g, b, Quantity_TOC_RGB))
                     self.occ_widget.display.Repaint()
         self.bgcolor_btn.clicked.connect(arka_plan_rengi_sec)
+
+        # --- Ortala Butonu ---
+        self.ortala_btn = QPushButton("🎯 Ortala")
+        self.ortala_btn.setStyleSheet(self.about_btn_style if hasattr(self, 'about_btn_style') else "")
+        self.ortala_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.right_bottom_vbox.addWidget(self.ortala_btn)
+        self.ortala_btn.clicked.connect(lambda: self.occ_widget.display.FitAll())
 
         # --- SEÇİLİ KATMANI SİL BUTONU ---
         self.delete_layer_btn = QPushButton("🗑️ Seçili Katmanı Sil")
@@ -1413,8 +1414,7 @@ class MainWindow(QWidget):
 
     def mesafe_sonuc_goster(self, mesafe):
         if hasattr(self, 'right_content_label'):
-            html = self.logo_img_html
-            html += f'<div style="color:#FFD600; font-size:18px;"><b>İki nokta arası mesafe:</b> {mesafe:.2f} birim</div>'
+            html = f'<div style="color:#FFD600; font-size:18px;"><b>İki nokta arası mesafe:</b> {mesafe:.2f} birim</div>'
             self.right_content_label.setText(html)
         # Mesafe ölçümü tamamlandığında butonun rengini eski haline döndür
         if hasattr(self, 'olcum_btn') and hasattr(self, 'about_btn_style'):
@@ -1428,19 +1428,32 @@ class MainWindow(QWidget):
         """Hakkında penceresini gösterir."""
         self.right_frame.setVisible(True)
         self.hide_log_download_button()
-        html = "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>" \
-               "<p><b>Versiyon:</b> 1.0.0</p>" \
-               "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>" \
-               "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>" \
-               "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>" \
-               "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>" \
-               "<li style='margin-bottom:2px;'>STL (.stl)</li>" \
-               "<li style='margin-bottom:2px;'>FBX (.fbx)</li>" \
-               "<li style='margin-bottom:2px;'>GLB (.glb)</li>" \
-               "<li style='margin-bottom:2px;'>OBJ (.obj)</li>" \
-               "</ul>" \
-               "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>" \
-               "</div>"
+        html = """
+        <div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:left;'>
+            <h2 style='color: #FFD600; text-align:center;'>BOXR_CAD</h2>
+            <p style='text-align:center;'><b>Versiyon:</b> 1.0.0</p>
+            <p>
+                BOXR_CAD, mühendisler, tasarımcılar ve 3D meraklıları için geliştirilmiş, açık kaynaklı bir CAD ve mesh model görüntüleme aracıdır. Amacı, karmaşık 3D verileri anlamayı, analiz etmeyi ve farklı platformlar arasında taşımayı kolaylaştırmaktır.
+            </p>
+            <br>
+            <h3 style='color: #2196f3;'>Teknoloji Altyapısı</h3>
+            <ul style='list-style-position: inside; padding-left: 10px;'>
+                <li><b>Arayüz (GUI):</b> PyQt5</li>
+                <li><b>3D Görüntüleme Motoru:</b> PythonOCC (OpenCASCADE Technology)</li>
+                <li><b>Mesh İşlemleri ve Dönüşümler:</b> Trimesh</li>
+                <li><b>Programlama Dili:</b> Python 3</li>
+            </ul>
+
+            <h3 style='color: #2196f3;'>Temel Yetenekler</h3>
+            <ul style='list-style-position: inside; padding-left: 10px;'>
+                <li><b>Gelişmiş Görüntüleyici:</b> STEP, IGES, STL, OBJ gibi endüstri standardı formatları destekler.</li>
+                <li><b>Model Analizi:</b> Vertex, kenar ve yüzey bazında detaylı geometrik bilgi ve ölçüm yetenekleri sunar.</li>
+                <li><b>Format Dönüştürme:</b> Mesh ve CAD formatları arasında (örn. STEP'den STL'e) dönüşüm yapabilir.</li>
+            </ul>
+            <br>
+            <p style='font-size:13px; color:#fcb045; text-align:center;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>
+        </div>
+        """
         self.right_content_label.setText(html)
 
     def show_help_dialog(self):
@@ -1449,39 +1462,35 @@ class MainWindow(QWidget):
         self.hide_log_download_button()
         html = """
         <div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:left;'>
-            <h2 style='color: #FFD600; text-align:center;'>Kullanım Kılavuzu</h2>
+            <h2 style='color: #FFD600; text-align:center;'>Kapsamlı Kullanım Kılavuzu</h2>
             
-            <h3 style='color: #2196f3;'>1. Model Yükleme</h3>
-            <p> - <b>➕ Katman Ekle:</b> Butonuna tıklayarak veya model dosyasını (STEP, IGES, STL, OBJ) doğrudan 3D görünüm alanına sürükleyip bırakarak yeni bir katmana model yükleyebilirsiniz.</p>
+            <h3 style='color: #2196f3;'>1. Model Yükleme ve Katman Mantığı</h3>
+            <p>Uygulama, katman tabanlı bir çalışma sistemine sahiptir. Her model, kendi katmanı üzerinde işlem görür. Bu, birden fazla modeli aynı sahnede yönetmenizi sağlar.</p>
+            <p> - <b>Dosyadan Yükleme:</b> Sol paneldeki <b>➕ Katman Ekle</b> butonu ile bir dosya seçtiğinizde, bu model yeni bir katman olarak sahneye eklenir.</p>
+            <p> - <b>Sürükle ve Bırak:</b> Desteklenen bir model dosyasını (STEP, IGES, STL, OBJ) bilgisayarınızdan sürükleyip doğrudan 3D görüntüleme alanına bırakarak da yeni bir katman oluşturabilirsiniz.</p>
             
             <h3 style='color: #2196f3;'>2. Katman Yönetimi</h3>
-            <p> - Sağ alttaki <b>Katmanlar</b> listesinden istediğiniz katmanı seçebilirsiniz.</p>
-            <p> - <b>Katman Görünürlüğü:</b> Katman isminin yanındaki kutucuğu işaretleyerek veya işareti kaldırarak modeli gizleyip gösterebilirsiniz.</p>
-            <p> - <b>Katman Silme:</b> Silmek istediğiniz katmanı seçip <b>🗑️ Seçili Katmanı Sil</b> butonuna basın veya katmana sağ tıklayıp silin.</p>
-            <p> - <b>Katman Taşıma/Döndürme:</b> Katmanı seçtikten sonra, katman listesinin altındaki ok (↑,↓,←,→) ve döndürme (X↻, Y↻, Z↻) butonları ile modeli hareket ettirebilirsiniz.</p>
+            <p>Sağ alttaki <b>Katmanlar</b> listesi, sahnedeki tüm modelleri yönettiğiniz yerdir.</p>
+            <p> - <b>Seçim:</b> Bir katmana tıklayarak onu aktif hale getirebilirsiniz. Taşıma, döndürme, renklendirme gibi işlemler aktif katman üzerinde yapılır.</p>
+            <p> - <b>Görünürlük:</b> Katman adının yanındaki onay kutusu (checkbox) ile o katmanı geçici olarak gizleyebilir veya tekrar görünür yapabilirsiniz.</p>
+            <p> - <b>Silme:</b> Bir katmanı kalıcı olarak silmek için, listeden seçin ve <b>🗑️ Seçili Katmanı Sil</b> butonuna basın. Alternatif olarak, katmana sağ tıklayıp açılan menüden 'Katmanı Sil' seçeneğini de kullanabilirsiniz.</p>
+            <p> - <b>Manipülasyon:</b> Aktif katmanı, katman listesinin altındaki ok ikonları (↑,↓,←,→) ile X ve Y eksenlerinde taşıyabilir, döndürme ikonları (X↻, Y↻, Z↻) ile kendi merkezi etrafında 15 derecelik adımlarla döndürebilirsiniz.</p>
 
-            <h3 style='color: #2196f3;'>3. Görüntüleme</h3>
-            <p> - <b>🎨 Görünüm Seçenekleri:</b> Modeli <b>Katı Model</b> veya <b>Tel Kafes</b> olarak görüntüleyebilirsiniz.</p>
-            <p> - <b>🎨 Renk Seç:</b> Seçili katmanın rengini değiştirir.</p>
-            <p> - <b>🖼️ Arka Plan Rengi:</b> 3D görüntüleyicinin arka plan rengini değiştirir.</p>
-            <p> - <b>🎯 Ortala:</b> Sahnedeki tüm modelleri ekrana sığdırır.</p>
+            <h3 style='color: #2196f3;'>3. Görüntüleme ve Navigasyon</h3>
+            <p> - <b>Görünüm Modları:</b> Sol paneldeki <b>🎨 Görünüm Seçenekleri</b> menüsünden, aktif modelin görünümünü <b>Katı Model (Shaded)</b> ve <b>Tel Kafes (Wireframe)</b> arasında değiştirebilirsiniz.</p>
+            <p> - <b>Renk Ayarları:</b> Sağ paneldeki <b>🎨 Renk Seç</b> butonu aktif katmanın rengini, <b>🖼️ Arka Plan Rengi</b> butonu ise 3D sahnenin genel arka plan rengini değiştirmenizi sağlar.</p>
+            <p> - <b>Kamera Kontrolü:</b> Fare tekerleği ile yakınlaşıp uzaklaşabilir, farenin orta tuşuna basılı tutarak sahneyi kaydırabilir (pan) ve farenin sol tuşuna basılı tutarak sahneyi döndürebilirsiniz (rotate).</p>
+            <p> - <b>Ortala (Fit All):</b> <b>🎯 Ortala</b> butonu, sahnedeki tüm modelleri ekrana tam sığacak şekilde kamerayı ayarlar.</p>
 
-            <h3 style='color: #2196f3;'>4. Analiz ve Ölçüm</h3>
-            <p> - <b>📏 Ölçüm Yap:</b> Menüsünden <b>Kenar</b>, <b>Vertex</b> veya <b>Alan</b> ölçümü yapabilirsiniz. İlgili butona bastıktan sonra 3D model üzerinde seçim yapmanız yeterlidir. Sonuçlar sağ panelde gösterilir.</p>
-            <p> - <b>👁️‍🗨️ Model Bilgileri:</b> Yüklü modelin dosya adı, vertex/yüzey sayısı gibi temel bilgilerini gösterir.</p>
+            <h3 style='color: #2196f3;'>4. Analiz ve Ölçüm Araçları</h3>
+            <p>Ölçüm yapmadan önce, ilgili katmanın sağdaki listeden seçili olduğundan emin olun.</p>
+            <p> - <b>Ölçüm Tipleri:</b> <b>📏 Ölçüm Yap</b> menüsü altından ölçmek istediğiniz geometri tipini (Kenar, Vertex, Alan) seçin. Seçim yaptıktan sonra imlecinizi 3D model üzerine getirin ve istediğiniz elemana tıklayın. Sonuçlar sağ panelde detaylı olarak gösterilecektir.</p>
+            <p> - <b>Model Bilgileri:</b> <b>👁️‍🗨️ Model Bilgileri</b> butonu, seçili katmandaki modelin dosya adı, yolu, vertex/yüzey sayısı ve kapladığı alan (bounding box) gibi temel verileri sağ panelde listeler.</p>
 
-            <h3 style='color: #2196f3;'>5. Kesit Alma</h3>
-            <p> - <b>✂️ Kesit Düzlemi:</b> Butonuna tıklayarak kesit alma arayüzünü açın.</p>
-            <p> - <b>Eksen ve Konum:</b> X, Y, Z eksenlerinden birini seçin ve slider veya metin kutusu ile kesit düzleminin konumunu ayarlayın.</p>
-            <p> - <b>💾 Kaydet:</b> Mevcut kesiti yeni bir STL dosyası olarak kaydeder ve sahneye yeni bir katman olarak ekler.</p>
-
-            <h3 style='color: #2196f3;'>6. Dosya Dönüştürme</h3>
-            <p> - <b>🔄 Dosya Dönüştür:</b> Menüsü altındaki seçeneklerle modellerinizi GLB, FBX, OBJ, STEP gibi popüler formatlara dönüştürebilirsiniz.</p>
-
-            <h3 style='color: #2196f3;'>7. Diğer Özellikler</h3>
-            <p> - <b>📱 AR'da Görüntüle:</b> Modeli `.glb` formatında seçerek telefonunuzda artırılmış gerçeklikte görüntülemek için bir QR kod oluşturur.</p>
-            <p> - <b>🖨️ 3D Yazıcıya Gönder:</b> Seçili modeli STL formatında dışa aktarır ve varsayılan dilimleme yazılımınızda açar.</p>
-            <p> - <b>📝 Loglar:</b> Uygulamanın çalışma zamanı kayıtlarını (loglarını) gösterir.</p>
+            <h3 style='color: #2196f3;'>5. İleri Düzey Araçlar</h3>
+            <p> - <b>Kesit Düzlemi:</b> <b>✂️ Kesit Düzlemi</b> aracı, modelin iç yapısını incelemek için kullanılır. X, Y veya Z eksenini seçip slider ile kesit düzleminin konumunu ayarlayabilirsiniz. <b>💾 Kaydet</b> butonu, o anki kesit yüzeyini yeni bir STL dosyası olarak kaydeder ve sahneye yeni bir katman olarak ekler.</p>
+            <p> - <b>Dosya Formatı Dönüştürme:</b> <b>🔄 Dosya Dönüştür</b> menüsü, desteklenen formatlar arasında (örneğin, STEP'den STL'e veya OBJ'den GLB'ye) dosya dönüşümleri yapmanızı sağlar.</p>
+            <p> - <b>AR Önizleme:</b> <b>📱 AR'da Görüntüle</b> özelliği, bir GLB modelini seçerek bir QR kod oluşturur. Bu kodu telefonunuzla taratarak modeli artırılmış gerçeklikte kendi ortamınızda görebilirsiniz.</p>
         </div>
         """
         self.right_content_label.setText(html)
@@ -1522,8 +1531,7 @@ class MainWindow(QWidget):
         self.hide_log_download_button()
         if hasattr(self, 'right_content_label'):
             info = self.occ_widget.get_model_info()
-            html = self.logo_img_html
-            html += "<div style='font-size:15px; color:#bfc7e6;'><b>Model Bilgileri:</b><br>"
+            html = "<div style='font-size:15px; color:#bfc7e6;'><b>Model Bilgileri:</b><br>"
             for k, v in info.items():
                 html += f"<b>{k}:</b> {v}<br>"
             html += "</div>"

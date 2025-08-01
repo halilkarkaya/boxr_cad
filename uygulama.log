@@ -1797,3 +1797,51 @@ TypeError: Wrong number or type of arguments for overloaded function 'gp_Pnt_Tra
 2025-08-01 13:32:43,863 - INFO - backend loaded: pyqt5
 2025-08-01 13:32:44,606 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
 2025-08-01 13:32:44,608 - INFO - Uygulama başlatıldı.
+2025-08-01 15:34:19,797 - INFO - backend loaded: pyqt5
+2025-08-01 15:34:25,577 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 15:34:25,580 - INFO - Uygulama başlatıldı.
+2025-08-01 15:36:17,859 - INFO - backend loaded: pyqt5
+2025-08-01 15:36:18,650 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 15:36:18,651 - INFO - Uygulama başlatıldı.
+2025-08-01 15:36:36,200 - INFO - backend loaded: pyqt5
+2025-08-01 15:36:36,992 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 15:36:36,993 - INFO - Uygulama başlatıldı.
+2025-08-01 15:40:26,144 - INFO - backend loaded: pyqt5
+2025-08-01 15:40:26,874 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 15:40:26,875 - INFO - Uygulama başlatıldı.
+2025-08-01 15:42:33,478 - INFO - backend loaded: pyqt5
+2025-08-01 15:42:34,132 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 15:42:34,134 - INFO - Uygulama başlatıldı.
+2025-08-01 15:44:58,114 - INFO - backend loaded: pyqt5
+2025-08-01 15:44:58,857 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 15:44:58,858 - INFO - Uygulama başlatıldı.
+2025-08-01 15:48:43,956 - INFO - backend loaded: pyqt5
+2025-08-01 15:48:44,605 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 15:48:44,605 - INFO - Uygulama başlatıldı.
+2025-08-01 16:01:05,173 - INFO - backend loaded: pyqt5
+2025-08-01 16:01:06,136 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:01:06,144 - INFO - Uygulama başlatıldı.
+2025-08-01 16:03:56,297 - INFO - backend loaded: pyqt5
+2025-08-01 16:03:56,988 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:03:56,989 - INFO - Uygulama başlatıldı.
+2025-08-01 16:09:00,258 - INFO - backend loaded: pyqt5
+2025-08-01 16:09:00,998 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:09:00,999 - INFO - Uygulama başlatıldı.
+2025-08-01 16:12:20,128 - INFO - backend loaded: pyqt5
+2025-08-01 16:12:20,781 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:12:20,782 - INFO - Uygulama başlatıldı.
+2025-08-01 16:14:11,733 - INFO - backend loaded: pyqt5
+2025-08-01 16:14:12,482 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:14:12,483 - INFO - Uygulama başlatıldı.
+2025-08-01 16:22:28,659 - INFO - backend loaded: pyqt5
+2025-08-01 16:22:29,459 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:22:29,460 - INFO - Uygulama başlatıldı.
+2025-08-01 16:22:34,720 - INFO - backend loaded: pyqt5
+2025-08-01 16:22:35,537 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:22:35,538 - INFO - Uygulama başlatıldı.
+2025-08-01 16:25:49,658 - INFO - backend loaded: pyqt5
+2025-08-01 16:25:50,524 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:25:50,525 - INFO - Uygulama başlatıldı.
+2025-08-01 16:35:17,247 - INFO - backend loaded: pyqt5
+2025-08-01 16:35:17,899 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 16:35:17,900 - INFO - Uygulama başlatıldı.

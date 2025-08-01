@@ -8,7 +8,7 @@ import trimesh
 import tempfile
 import os
 from OCC.Display.backend import load_backend
-load_backend("pyqt5")
+load_backend("pyqt5")  # OpenCASCADE'nin PyQt5 ile entegrasyonunu sağlar, 3D görüntüleme için gerekli
 from OCC.Display.qtDisplay import qtViewer3d
 from OCC.Extend.DataExchange import read_stl_file
 from PyQt5.QtCore import Qt
@@ -57,7 +57,6 @@ class OCCModelWidget(QWidget):
         super().__init__(parent)
         self.setLayout(QVBoxLayout())
         # --- Axis Gizmo ---
-        # Axis Gizmo ile ilgili kodlar kaldırıldı
         self._gizmo_rotating = False
         self._gizmo_last_pos = None
         self._gizmo_azimuth = 0.0
@@ -67,16 +66,6 @@ class OCCModelWidget(QWidget):
         self.layout().addWidget(self.canvas)
         self.canvas.InitDriver()
         self.display = self.canvas._display
-        # Arka planı gökyüzü gibi gradyan yap (üst: açık mavi, alt: beyaz)
-        try:
-            from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
-            self.display.View.SetBgGradientColors(
-                Quantity_Color(0.53, 0.81, 0.98, Quantity_TOC_RGB),  # Üst: gökyüzü mavisi
-                Quantity_Color(1.0, 1.0, 1.0, Quantity_TOC_RGB),     # Alt: beyaz
-                0, True  # Linear
-            )
-        except Exception as e:
-            print('Arka plan gradyan ayarlanamadı:', e)
         # 3D Grid (Graduated Trihedron)
         try:
             view = self.display.View

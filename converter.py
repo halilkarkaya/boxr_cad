@@ -7,9 +7,9 @@ import tempfile
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 ## \fn dosya_secici_ac(parent=None)
-#  \brief OBJ, STL, STEP, ve IGES dosyalarını seçmek için dosya seçici açar.
+#  \brief Kullanıcının bir 3D model dosyası seçmesi için bir dosya iletişim kutusu açar.
 #  \param parent QWidget veya None, dosya seçici için ebeveyn pencere.
-#  \return Seçilen dosya yolu (str) veya None.
+#  \return Seçilen dosyanın tam yolu (str) veya seçim iptal edilirse None.
 def dosya_secici_ac(parent=None):
     file_path, _ = QFileDialog.getOpenFileName(
         parent, "3D Model Dosyası Aç", "", 
@@ -21,9 +21,10 @@ def dosya_secici_ac(parent=None):
     return file_path or None
 
 ## \fn obj_to_stl(obj_path)
-#  \brief OBJ dosyasını geçici bir STL dosyasına dönüştürür.
-#  \param obj_path Kaynak OBJ dosya yolu (str).
-#  \return Oluşan geçici STL dosya yolu (str).
+#  \brief Bir OBJ dosyasını geçici bir STL dosyasına dönüştürür.
+#  \details Bu fonksiyon, trimesh kütüphanesini kullanarak bir OBJ dosyasını yükler ve sistemin geçici dizininde bir STL dosyası olarak dışa aktarır.
+#  \param obj_path Kaynak OBJ dosyasının yolu (str).
+#  \return Oluşturulan geçici STL dosyasının yolu (str).
 def obj_to_stl(obj_path):
     temp_dir = tempfile.gettempdir()
     temp_stl = os.path.join(temp_dir, "temp_obj_conversion.stl")
@@ -32,9 +33,9 @@ def obj_to_stl(obj_path):
     return temp_stl
 
 ## \fn obj_to_glb(obj_path)
-#  \brief OBJ dosyasını GLB formatına dönüştürür.
-#  \param obj_path Kaynak OBJ dosya yolu (str)
-#  \return Oluşan GLB dosya yolu (str)
+#  \brief Bir OBJ dosyasını GLB formatına dönüştürür.
+#  \param obj_path Kaynak OBJ dosyasının yolu (str).
+#  \return Oluşturulan GLB dosyasının yolu (str).
 def obj_to_glb(obj_path):
     mesh = trimesh.load(obj_path, force='mesh')
     glb_path = os.path.splitext(obj_path)[0] + ".glb"
@@ -42,15 +43,22 @@ def obj_to_glb(obj_path):
     return glb_path
 
 ## \fn stl_to_obj(stl_path)
-#  \brief STL dosyasını OBJ formatına dönüştürür.
-#  \param stl_path Kaynak STL dosya yolu (str)
-#  \return Oluşan OBJ dosya yolu (str)
+#  \brief Bir STL dosyasını OBJ formatına dönüştürür.
+#  \param stl_path Kaynak STL dosyasının yolu (str).
+#  \return Oluşturulan OBJ dosyasının yolu (str).
 def stl_to_obj(stl_path):
     mesh = trimesh.load(stl_path, force='mesh')
     obj_path = os.path.splitext(stl_path)[0] + ".obj"
     mesh.export(obj_path, file_type='obj')
     return obj_path
 
+## \fn obj_to_fbx(obj_path, fbx_path, blender_path)
+#  \brief Blender kullanarak bir OBJ dosyasını FBX formatına dönüştürür.
+#  \details Bu fonksiyon, ara format olarak GLB kullanarak ve bir Python betiği aracılığıyla Blender'ı arka planda çalıştırarak dönüşümü gerçekleştirir.
+#  \param obj_path Kaynak OBJ dosyasının yolu (str).
+#  \param fbx_path Hedef FBX dosyasının yolu (str).
+#  \param blender_path Blender yürütülebilir dosyasının yolu (str).
+#  \return Başarılı olursa FBX dosyasının yolu (str), aksi takdirde None.
 def obj_to_fbx(obj_path, fbx_path, blender_path=r"D:\\blender\\blender-launcher.exe"):
     temp_dir = tempfile.gettempdir()
     temp_stl = os.path.join(temp_dir, "temp_obj2fbx.stl")
@@ -91,6 +99,9 @@ bpy.ops.export_scene.fbx(filepath=r'{fbx_path}')
             if os.path.exists(f):
                 os.remove(f)
 
+## \fn convert_to_glb(self)
+#  \brief Kullanıcıdan bir OBJ dosyası seçmesini ister ve GLB formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_to_glb(self):
     source_path = dosya_secici_ac(parent=self)
     if not source_path: return
@@ -111,6 +122,9 @@ def convert_to_glb(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"GLB'ye dönüştürme başarısız: {e}")
 
+## \fn convert_to_fbx(self)
+#  \brief Kullanıcıdan bir OBJ dosyası seçmesini ister ve FBX formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_to_fbx(self):
     source_path = dosya_secici_ac(parent=self)
     if not source_path: return
@@ -132,6 +146,9 @@ def convert_to_fbx(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"FBX'e dönüştürme başarısız: {e}")
 
+## \fn convert_to_obj(self)
+#  \brief Kullanıcıdan bir STL dosyası seçmesini ister ve OBJ formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_to_obj(self):
     source_path = dosya_secici_ac(parent=self)
     if not source_path: return
@@ -152,6 +169,9 @@ def convert_to_obj(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"OBJ'ye dönüştürme başarısız: {e}")
 
+## \fn convert_to_step(self)
+#  \brief Kullanıcıdan bir mesh dosyası (OBJ, STL) veya IGES dosyası seçmesini ister ve STEP formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_to_step(self):
     from OCC.Extend.DataExchange import write_step_file, read_stl_file, read_iges_file
     source_path = dosya_secici_ac(parent=self)
@@ -191,6 +211,9 @@ def convert_to_step(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"STEP'e dönüştürme başarısız: {e}")
 
+## \fn convert_to_ply(self)
+#  \brief Kullanıcıdan bir mesh dosyası seçmesini ister ve PLY formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_to_ply(self):
     import trimesh
     source_path = dosya_secici_ac(parent=self)
@@ -209,6 +232,9 @@ def convert_to_ply(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"PLY'ye dönüştürme başarısız: {e}")
 
+## \fn convert_to_gltf(self)
+#  \brief Kullanıcıdan bir mesh dosyası seçmesini ister ve GLTF formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_to_gltf(self):
     import trimesh
     source_path = dosya_secici_ac(parent=self)
@@ -227,6 +253,9 @@ def convert_to_gltf(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"GLTF'ye dönüştürme başarısız: {e}")
 
+## \fn convert_to_3mf(self)
+#  \brief Kullanıcıdan bir mesh dosyası seçmesini ister ve 3MF formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_to_3mf(self):
     import trimesh
     source_path = dosya_secici_ac(parent=self)
@@ -245,6 +274,9 @@ def convert_to_3mf(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"3MF'ye dönüştürme başarısız: {e}")
 
+## \fn convert_to_dae(self)
+#  \brief Kullanıcıdan bir mesh dosyası seçmesini ister ve DAE (Collada) formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_to_dae(self):
     import trimesh
     source_path = dosya_secici_ac(parent=self)
@@ -263,6 +295,9 @@ def convert_to_dae(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"DAE'ye dönüştürme başarısız: {e}")
 
+## \fn convert_step_to_stl(self)
+#  \brief Kullanıcıdan bir STEP/IGES dosyası seçmesini ister ve STL formatına dönüştürür.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_step_to_stl(self):
     from OCC.Extend.DataExchange import read_step_file, read_iges_file
     from OCC.Core.StlAPI import StlAPI_Writer
@@ -289,6 +324,10 @@ def convert_step_to_stl(self):
     except Exception as e:
         QMessageBox.critical(self, "Hata", f"STL'ye dönüştürme başarısız: {e}")
 
+## \fn convert_step_to_obj(self)
+#  \brief Kullanıcıdan bir STEP/IGES dosyası seçmesini ister ve OBJ formatına dönüştürür.
+#  \details Bu fonksiyon, ara format olarak STL kullanarak dönüşümü gerçekleştirir.
+#  \param self MainWindow örneği, QFileDialog için ebeveyn olarak kullanılır.
 def convert_step_to_obj(self):
     from OCC.Extend.DataExchange import read_step_file, read_iges_file
     import trimesh
