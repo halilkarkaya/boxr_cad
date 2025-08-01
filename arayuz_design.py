@@ -465,6 +465,25 @@ class MainWindow(QWidget):
             btn.setVisible(visible)
 
     def setup_measurement(self, measure_type, selection_mode):
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen ölçüm yapmak için bir katman seçin.")
+            return
+
+        layer = self.layers[idx]
+        model_path = layer.get("model_path")
+        model_refs = layer.get("model_refs")
+
+        if not model_path or not os.path.exists(model_path):
+            QMessageBox.warning(self, "Hata", f"Seçili katmana ait model dosyası bulunamadı:\n{model_path}")
+            return
+        
+        if not model_refs:
+            QMessageBox.warning(self, "Hata", "Seçili katmanın 3D referansı bulunamadı.")
+            return
+
+        # Pass model path and the AIS reference to the widget
+        self.occ_widget.set_active_model_for_measurement(model_path, model_refs[0])
         self.occ_widget.active_measure = measure_type
         self.occ_widget.set_selection_mode(selection_mode)
         self.occ_widget.set_measure_mode(True)

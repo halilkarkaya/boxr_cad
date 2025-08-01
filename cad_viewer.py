@@ -95,6 +95,14 @@ class OCCModelWidget(QWidget):
         self._current_trsf = gp_Trsf()  # Modelin mevcut transformasyonu
         self.models = []  # Tüm model referansları (AIS_Shape)
         self.model_trsfs = {}  # Her model için dönüşüm matrisi
+        # For measurement
+        self.measurement_model_path = None
+        self.measurement_model_ref = None
+
+    def set_active_model_for_measurement(self, model_path, model_ref):
+        """Sets the model to be used for the next measurement operation."""
+        self.measurement_model_path = model_path
+        self.measurement_model_ref = model_ref
 
     def resizeEvent(self, event):
         margin_x = 30
@@ -114,9 +122,25 @@ class OCCModelWidget(QWidget):
             if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
                 pos = event.pos()
                 x, y = pos.x(), pos.y()
-                if self.model_path and os.path.exists(self.model_path):
+                if self.measurement_model_path and os.path.exists(self.measurement_model_path):
                     try:
-                        mesh = trimesh.load(self.model_path, force='mesh')
+                        mesh = trimesh.load(self.measurement_model_path, force='mesh')
+                        
+                        # Get transformation and apply it to vertices
+                        trsf = gp_Trsf()
+                        if self.measurement_model_ref and hasattr(self.measurement_model_ref, 'LocalTransformation'):
+                            trsf = self.measurement_model_ref.LocalTransformation()
+                        
+                        from OCC.Core.gp import gp_Pnt
+                        transformed_vertices = []
+                        for v_np in mesh.vertices:
+                            p = gp_Pnt(float(v_np[0]), float(v_np[1]), float(v_np[2]))
+                            p.Transform(trsf)
+                            transformed_vertices.append(np.array([p.X(), p.Y(), p.Z()]))
+                        
+                        # Use a new mesh with transformed vertices for all calculations
+                        mesh.vertices = np.array(transformed_vertices)
+
                         # Kenar Ölçüm
                         if hasattr(self, 'active_measure') and self.active_measure == 'edge':
                             min_dist = float('inf')
