@@ -104,7 +104,7 @@ class MainWindow(QWidget):
 
             # Katman oluştur ve listeye ekle
             layer_name = f"Katman {len(self.layers) + 1}"
-            layer = {"name": layer_name, "visible": True, "model_refs": [model_ref]}
+            layer = {"name": layer_name, "visible": True, "model_refs": [model_ref], "model_path": dosya_yolu}
             self.layers.append(layer)
 
             # Arayüzde katman listesini güncelle
@@ -376,12 +376,32 @@ class MainWindow(QWidget):
         vbox.addWidget(self.ar_btn)
         self.left_panel_buttons.append(self.ar_btn)
 
-        # 9. 3D Yazıcıya Gönder
-        self.printer_btn = QPushButton("🖨️ 3D Yazıcıya Gönder")
-        self.printer_btn.setStyleSheet(main_btn_style)
-        self.printer_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        vbox.addWidget(self.printer_btn)
-        self.left_panel_buttons.append(self.printer_btn)
+        # 9. 3D Yazıcı (Main Button)
+        self.printer_main_btn = QPushButton("🖨️ 3D Yazıcı")
+        self.printer_main_btn.setStyleSheet(main_btn_style)
+        self.printer_main_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        vbox.addWidget(self.printer_main_btn)
+        self.left_panel_buttons.append(self.printer_main_btn)
+
+        self.printer_sub_buttons = []
+
+        # 3D Yazıcıya Gönder (Sub-button)
+        self.send_to_printer_btn = QPushButton("➡️ 3D Yazıcıya Gönder")
+        self.send_to_printer_btn.setStyleSheet(sub_btn_style)
+        self.send_to_printer_btn.setVisible(False)
+        self.send_to_printer_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.send_to_printer_btn.setFixedHeight(32)
+        vbox.addWidget(self.send_to_printer_btn)
+        self.printer_sub_buttons.append(self.send_to_printer_btn)
+
+        # 3D Yazıcı Seç/Değiştir (Sub-button)
+        self.printer_settings_btn = QPushButton("⚙️ 3D Yazıcı Seç/Değiştir")
+        self.printer_settings_btn.setStyleSheet(sub_btn_style)
+        self.printer_settings_btn.setVisible(False)
+        self.printer_settings_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.printer_settings_btn.setFixedHeight(32)
+        vbox.addWidget(self.printer_settings_btn)
+        self.printer_sub_buttons.append(self.printer_settings_btn)
 
         # 10. Loglar
         logs_btn = QPushButton("📝 Loglar")
@@ -421,7 +441,9 @@ class MainWindow(QWidget):
         self.section_btn.clicked.connect(self.toggle_section_ui)
         self.ortala_btn.clicked.connect(lambda: self.occ_widget.display.FitAll())
         self.ar_btn.clicked.connect(self.show_ar_preview)
-        self.printer_btn.clicked.connect(self.send_to_printer)
+        self.printer_main_btn.clicked.connect(lambda: self.toggle_sub_menu(self.printer_sub_buttons))
+        self.send_to_printer_btn.clicked.connect(self.send_to_printer)
+        self.printer_settings_btn.clicked.connect(self.select_printer_path)
         logs_btn.clicked.connect(self.show_logs)
         self.help_btn.clicked.connect(self.show_help_dialog)  # Yardım butonuna fonksiyonu bağla
         about_btn.clicked.connect(self.show_about_dialog)
@@ -617,9 +639,21 @@ class MainWindow(QWidget):
             logging.error(f"Kesit kaydedilirken hata: {e}", exc_info=True)
             QMessageBox.critical(self, "Kritik Hata", f"Kesit kaydedilemedi:\n{e}")
 
+    def select_printer_path(self):
+        """Kullanıcının 3D yazıcı yazılımının yolunu seçmesini ve kaydetmesini sağlar."""
+        config_path = os.path.join(os.path.expanduser("~"), ".boxr_cad_printer.json")
+        printer_path, _ = QFileDialog.getOpenFileName(self, "3D Yazıcı Yazılımını Seç", "", "Uygulama (*.exe)")
+        if printer_path:
+            try:
+                with open(config_path, "w", encoding="utf-8") as f:
+                    json.dump({"printer_path": printer_path}, f)
+                QMessageBox.information(self, "Başarılı", f"Yazıcı yolu kaydedildi:\n{printer_path}")
+            except Exception as e:
+                QMessageBox.warning(self, "Hata", f"Yazıcı yolu kaydedilemedi: {e}")
+
     def send_to_printer(self):
         from PyQt5.QtWidgets import QFileDialog, QMessageBox
-        import tempfile, os, json
+        import tempfile, os, json, subprocess
 
         config_path = os.path.join(os.path.expanduser("~"), ".boxr_cad_printer.json")
         printer_path = None
@@ -630,15 +664,17 @@ class MainWindow(QWidget):
             except Exception: pass
 
         if not printer_path or not os.path.exists(printer_path):
-            default_cura = r"D:\Yeni klasör (3)\UltiMaker Cura 5.10.1\UltiMaker-Cura.exe"
-            printer_path, _ = QFileDialog.getOpenFileName(self, "3D Yazıcı Yazılımını Seç", default_cura, "Uygulama (*.exe)")
-            if not printer_path:
-                QMessageBox.warning(self, "Yazıcı Yazılımı Gerekli", "3D yazıcı yazılımı seçilmedi.")
-                return
-            try:
-                with open(config_path, "w", encoding="utf-8") as f:
-                    json.dump({"printer_path": printer_path}, f)
-            except Exception: pass
+            QMessageBox.information(self, "Yazıcı Yazılımı Gerekli", "Lütfen önce 'Yazıcı Ayarları' butonundan yazıcı yazılımınızın konumunu seçin.")
+            self.select_printer_path()
+            # Kullanıcı seçim yaptıktan sonra tekrar kontrol et
+            if os.path.exists(config_path):
+                try:
+                    with open(config_path, "r", encoding="utf-8") as f:
+                        printer_path = json.load(f).get("printer_path")
+                except Exception: pass
+            
+            if not printer_path or not os.path.exists(printer_path):
+                return # Kullanıcı hala seçim yapmadıysa işlemi iptal et
         
         idx = self.layer_list.currentRow()
         if idx < 0:
@@ -647,34 +683,45 @@ class MainWindow(QWidget):
         
         model_path = self.layers[idx].get("model_path")
         if not model_path or not os.path.exists(model_path):
-            QMessageBox.warning(self, "Hata", "Model dosyası bulunamadı.")
+            QMessageBox.warning(self, "Hata", f"Model dosyası bulunamadı: {model_path}")
             return
 
         try:
             import trimesh
-            temp_stl = os.path.join(tempfile.gettempdir(), f"boxr_cad_export_{idx}.stl")
+            # Dosya adını koruyarak geçici bir STL oluştur
+            temp_stl = os.path.join(tempfile.gettempdir(), f"boxr_cad_export_{os.path.basename(model_path)}.stl")
             mesh = trimesh.load(model_path, force='mesh')
             mesh.export(temp_stl, file_type='stl')
-            os.startfile(temp_stl)
-            QMessageBox.information(self, "Başarılı", f"Model STL olarak dışa aktarıldı ve varsayılan yazılımda açıldı: {temp_stl}")
+            
+            subprocess.Popen([printer_path, temp_stl])
+            
+            QMessageBox.information(self, "Başarılı", f"Model STL olarak dışa aktarıldı ve {os.path.basename(printer_path)} yazılımında açıldı.")
         except Exception as e:
-            QMessageBox.warning(self, "Hata", f"Model dışa aktarılamadı: {e}")
+            logging.error(f"3D yazıcıya gönderilirken hata: {e}", exc_info=True)
+            QMessageBox.warning(self, "Hata", f"Model yazıcıya gönderilemedi: {e}")
 
     def show_logs(self):
         self.right_frame.setVisible(True)
+        self.hide_log_download_button() # Önce diğer butonları gizle
         try:
             with open(log_path, 'r', encoding='utf-8') as f:
                 log_text = ''.join(f.readlines()[-100:]) # Son 100 satır
-            html = self.logo_img_html + f"<div style='font-size:13px; color:#FFD600; background:#232836;'><pre>{log_text}</pre></div>"
+            # HTML formatından kaçış karakterlerini temizle
+            import html
+            log_text_escaped = html.escape(log_text)
+            html_content = f"<div style='font-size:13px; color:#FFD600;'><pre>{log_text_escaped}</pre></div>"
         except Exception as e:
-            html = self.logo_img_html + f"<span style='color:red;'>Log dosyası okunamadı: {e}</span>"
+            html_content = f"<span style='color:red;'>Log dosyası okunamadı: {e}</span>"
         
-        self.right_content_label.setText(html)
-        if not hasattr(self, 'log_download_btn'):
+        self.right_content_label.setText(html_content)
+        
+        if not hasattr(self, 'log_download_btn') or self.log_download_btn is None:
             self.log_download_btn = QPushButton('Tüm Logları İndir')
             self.log_download_btn.setStyleSheet('background-color:#FFD600; color:#232836; font-weight:bold; border-radius:8px; padding:8px; margin-top:12px;')
             self.log_download_btn.clicked.connect(self.download_logs)
+            # Butonu right_top_vbox'un altına, scroll area'dan sonra ekle
             self.right_top_vbox.addWidget(self.log_download_btn)
+        
         self.log_download_btn.setVisible(True)
 
     def hide_log_download_button(self):
@@ -716,7 +763,7 @@ class MainWindow(QWidget):
                 model_ref = self.occ_widget.add_model(stl_path, model_path=default_obj)
                 # 1. katman olarak ekle
                 layer_name = "Katman 1 (Varsayılan)"
-                layer = {"name": layer_name, "visible": True, "model_refs": [model_ref]}
+                layer = {"name": layer_name, "visible": True, "model_refs": [model_ref], "model_path": default_obj}
                 self.layers.append(layer)
                 # Katman paneline ekle (layer_list kesinlikle sağ panelde oluşturulduktan sonra ekleniyor)
                 def add_first_layer_item():
@@ -756,42 +803,31 @@ class MainWindow(QWidget):
         self.right_bottom_vbox = QVBoxLayout()
         self.right_bottom_vbox.setSpacing(10)
 
-        # --- digimode.png logo en üste ---
-        # Logo artık içeriklerin üstünde HTML olarak gösterilecek
-        self.logo_img_html = f"<div style='text-align:center; margin-bottom:10px;'><img src='file:///{os.path.join(os.path.dirname(__file__), 'digimode.png').replace(os.sep, '/')}' width='120'/></div>"
-        # ---
-        # Tek bir içerik alanı QLabel
+        # --- Logo Widget ---
+        self.logo_label = QLabel()
+        pixmap = QPixmap(os.path.join(os.path.dirname(__file__), 'digimode.png'))
+        self.logo_label.setPixmap(pixmap.scaledToWidth(120, Qt.SmoothTransformation))
+        self.logo_label.setAlignment(Qt.AlignCenter)
+        self.logo_label.setStyleSheet("background: transparent; margin-bottom: 10px;")
+        self.right_top_vbox.addWidget(self.logo_label)
+
+        # --- İçerik Alanı ---
         self.right_content_label = QLabel()
         self.right_content_label.setWordWrap(True)
         self.right_content_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        self.right_content_label.setStyleSheet("background: #232836; color: #bfc7e6; border-radius: 10px; padding: 12px;")
-        # Kaydırılabilir alan ekle
+        self.right_content_label.setStyleSheet("background: transparent; color: #bfc7e6; padding: 2px;")
+
         self.right_scroll_area = QScrollArea()
         self.right_scroll_area.setWidgetResizable(True)
-        self.right_scroll_area.setStyleSheet("background: #232836; border-radius: 10px;")
+        self.right_scroll_area.setStyleSheet("background: #232836; border: 1px solid #353b4a; border-radius: 10px; padding: 10px;")
         self.right_scroll_area.setWidget(self.right_content_label)
         self.right_top_vbox.addWidget(self.right_scroll_area, 1)
+
         # Başlangıçta hakkında göster
-        self.right_content_label.setText(
-            self.logo_img_html +
-            "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>"
-            "<p><b>Versiyon:</b> 1.0.0</p>"
-            "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>"
-            "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>"
-            "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>"
-            "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>"
-            "<li style='margin-bottom:2px;'>STL (.stl)</li>"
-            "<li style='margin-bottom:2px;'>FBX (.fbx)</li>"
-            "<li style='margin-bottom:2px;'>GLB (.glb)</li>"
-            "<li style='margin-bottom:2px;'>OBJ (.obj)</li>"
-            "</ul>"
-            "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>"
-            "</div>"
-        )
-        self.right_top_vbox.addStretch()
+        self.show_about_dialog()
+        
         # Alt bölüme butonlar eklenecek
         from PyQt5.QtWidgets import QColorDialog, QPushButton, QMessageBox
-        # self.right_bottom_vbox.addStretch() kaldırıldı veya en sona taşındı
         self.color_btn = QPushButton("🎨 Renk Seç")
         self.color_btn.setStyleSheet(self.about_btn_style if hasattr(self, 'about_btn_style') else "")
         self.color_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -998,7 +1034,7 @@ class MainWindow(QWidget):
         # ))
 
         # Sağ panelde (create_right_panel) self.right_top_vbox.addStretch() ve self.right_bottom_vbox.addStretch() en sona taşınacak
-        self.right_top_vbox.addStretch()
+        self.right_top_vbox.addStretch(0)
         
         # --- TEMA TOGGLE BUTONU EKLE ---
         self.is_light_theme = False  # Başlangıçta koyu tema
@@ -1016,8 +1052,8 @@ class MainWindow(QWidget):
             # Sağ panel
             self.right_frame.setStyleSheet("background-color: #f9f9f9; border-radius: 12px;")
             # Sağ panel içerik alanı
-            self.right_content_label.setStyleSheet("background: #fff; color: #232836; border-radius: 10px; padding: 12px;")
-            self.right_scroll_area.setStyleSheet("background: #fff; border-radius: 10px;")
+            self.right_content_label.setStyleSheet("background: transparent; color: #232836; padding: 2px;")
+            self.right_scroll_area.setStyleSheet("background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 10px;")
             # Katman listesi
             self.layer_list.setStyleSheet("""
                 QListWidget {
@@ -1089,12 +1125,12 @@ class MainWindow(QWidget):
             if hasattr(self, 'left_frame'):
                 self.left_frame.setStyleSheet("background-color: #232836; border-radius: 12px;")
             self.right_frame.setStyleSheet("background-color: #232836; border-radius: 12px;")
-            self.right_content_label.setStyleSheet("background: #232836; color: #bfc7e6; border-radius: 10px; padding: 12px;")
-            self.right_scroll_area.setStyleSheet("background: #232836; border-radius: 10px;")
+            self.right_content_label.setStyleSheet("background: transparent; color: #bfc7e6; padding: 2px;")
+            self.right_scroll_area.setStyleSheet("background: #232836; border: 1px solid #353b4a; border-radius: 10px; padding: 10px;")
             self.layer_list.setStyleSheet("""
                 QListWidget {
-                    background: #232836;
-                    color: #bfc7e6;
+                    background: #181c24;
+                    color: #FFD600;
                     border: 2px solid #353b4a;
                     border-radius: 10px;
                     font-size: 15px;
@@ -1373,14 +1409,26 @@ class MainWindow(QWidget):
         """Hakkında penceresini gösterir."""
         self.right_frame.setVisible(True)
         self.hide_log_download_button()
-        html = self.logo_img_html +             "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>"             "<p><b>Versiyon:</b> 1.0.0</p>"             "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>"             "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>"             "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>"             "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>"             "<li style='margin-bottom:2px;'>STL (.stl)</li>"             "<li style='margin-bottom:2px;'>FBX (.fbx)</li>"             "<li style='margin-bottom:2px;'>GLB (.glb)</li>"             "<li style='margin-bottom:2px;'>OBJ (.obj)</li>"             "</ul>"             "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>"             "</div>"
+        html = "<div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:center;'>" \
+               "<p><b>Versiyon:</b> 1.0.0</p>" \
+               "<p>Bu uygulama çeşitli CAD formatlarını görüntülemek ve dönüştürmek için tasarlanmıştır.</p>" \
+               "<h3 style='color: #2196f3;'>Desteklenen formatlar:</h3>" \
+               "<ul style='text-align:left; margin: 0 auto 0 30px; padding-left:0;'>" \
+               "<li style='margin-bottom:2px;'>STEP (.step, .stp)</li>" \
+               "<li style='margin-bottom:2px;'>STL (.stl)</li>" \
+               "<li style='margin-bottom:2px;'>FBX (.fbx)</li>" \
+               "<li style='margin-bottom:2px;'>GLB (.glb)</li>" \
+               "<li style='margin-bottom:2px;'>OBJ (.obj)</li>" \
+               "</ul>" \
+               "<p style='font-size:13px; color:#fcb045;'>© 2025 digiMODE. Tüm hakları saklıdır.</p>" \
+               "</div>"
         self.right_content_label.setText(html)
 
     def show_help_dialog(self):
         """Yardım ve Sıkça Sorulan Sorular penceresini gösterir."""
         self.right_frame.setVisible(True)
         self.hide_log_download_button()
-        html = self.logo_img_html + """
+        html = """
         <div style='font-family: Segoe UI; font-size: 15px; color:#bfc7e6; text-align:left;'>
             <h2 style='color: #FFD600; text-align:center;'>Kullanım Kılavuzu</h2>
             

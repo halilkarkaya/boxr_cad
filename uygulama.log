@@ -1750,3 +1750,38 @@ TypeError: Wrong number or type of arguments for overloaded function 'gp_Pnt_Tra
 2025-07-31 18:02:46,132 - INFO - backend loaded: pyqt5
 2025-07-31 18:02:46,894 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
 2025-07-31 18:02:46,894 - INFO - Uygulama başlatıldı.
+2025-07-31 23:39:03,364 - INFO - backend loaded: pyqt5
+2025-07-31 23:39:12,489 - INFO - backend loaded: pyqt5
+2025-07-31 23:39:14,441 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-31 23:39:14,441 - INFO - Uygulama başlatıldı.
+2025-07-31 23:40:01,727 - INFO - backend loaded: pyqt5
+2025-07-31 23:40:02,576 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-07-31 23:40:02,576 - INFO - Uygulama başlatıldı.
+2025-08-01 11:31:25,490 - INFO - backend loaded: pyqt5
+2025-08-01 11:31:33,310 - INFO - backend loaded: pyqt5
+2025-08-01 11:31:34,336 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 11:31:34,337 - INFO - Uygulama başlatıldı.
+2025-08-01 11:49:48,843 - INFO - backend loaded: pyqt5
+2025-08-01 11:49:49,777 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 11:49:49,778 - INFO - Uygulama başlatıldı.
+2025-08-01 11:53:54,366 - INFO - backend loaded: pyqt5
+2025-08-01 11:53:55,247 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 11:53:55,248 - INFO - Uygulama başlatıldı.
+2025-08-01 11:55:54,478 - INFO - backend loaded: pyqt5
+2025-08-01 11:55:55,320 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 11:55:55,320 - INFO - Uygulama başlatıldı.
+2025-08-01 12:26:07,332 - INFO - backend loaded: pyqt5
+2025-08-01 12:26:07,975 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 12:26:07,975 - INFO - Uygulama başlatıldı.
+2025-08-01 12:35:16,789 - INFO - backend loaded: pyqt5
+2025-08-01 12:35:17,482 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 12:35:17,483 - INFO - Uygulama başlatıldı.
+2025-08-01 12:49:07,693 - INFO - backend loaded: pyqt5
+2025-08-01 12:49:08,477 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 12:49:08,478 - INFO - Uygulama başlatıldı.
+2025-08-01 12:56:29,646 - INFO - backend loaded: pyqt5
+2025-08-01 12:56:30,279 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 12:56:30,279 - INFO - Uygulama başlatıldı.
+2025-08-01 13:00:46,611 - INFO - backend loaded: pyqt5
+2025-08-01 13:00:47,298 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-01 13:00:47,299 - INFO - Uygulama başlatıldı.
