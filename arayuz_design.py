@@ -1107,7 +1107,7 @@ class MainWindow(QWidget):
                     color: #232836;
                 }
             """
-            for btn in [self.color_btn, self.bgcolor_btn, self.delete_layer_btn, self.theme_toggle_btn]:
+            for btn in [self.color_btn, self.bgcolor_btn, self.ortala_btn, self.delete_layer_btn, self.theme_toggle_btn]:
                 btn.setStyleSheet(light_btn_style)
             # Katman hareket/döndürme butonları
             light_katman_btn_style = """
@@ -1178,7 +1178,7 @@ class MainWindow(QWidget):
                     color: #232836;
                 }
             """
-            for btn in [self.color_btn, self.bgcolor_btn, self.delete_layer_btn, self.theme_toggle_btn]:
+            for btn in [self.color_btn, self.bgcolor_btn, self.ortala_btn, self.delete_layer_btn, self.theme_toggle_btn]:
                 btn.setStyleSheet(dark_btn_style)
             dark_katman_btn_style = """
                 QPushButton {
@@ -1240,8 +1240,8 @@ class MainWindow(QWidget):
                 self.section_btn.setStyleSheet(dark_btn_style)
             for label in getattr(self, 'left_panel_labels', []):
                 label.setStyleSheet("color: #FFD600; letter-spacing: 3px; margin-bottom: 8px; margin-top: 8px;" if "BOXR CAD" in label.text() else "color: #bfc7e6;")
-            # Ölçüm alt butonları (küçük, tema uyumlu)
-            dark_olcum_sub_btn_style = """
+            # Alt menü butonları için koyu tema stili
+            dark_sub_btn_style = """
                 QPushButton {
                     background-color: #444a5a;
                     color: #fff;
@@ -1253,36 +1253,16 @@ class MainWindow(QWidget):
                     text-align: left;
                 }
                 QPushButton:hover {
-                    background-color: #FFD600;
-                    color: #232836;
+                    background-color: #5a6275;
+                    color: #fff;
                 }
             """
-            for btn in [getattr(self, 'kenar_olc_btn', None), getattr(self, 'vertex_olc_btn', None), getattr(self, 'alan_olc_btn', None)]:
-                if btn:
-                    btn.setStyleSheet(dark_olcum_sub_btn_style)
-                    btn.setFixedHeight(32) # Sabit yükseklik
+            # Tüm alt menü butonlarına stili uygula
+            for btn_list in [self.convert_sub_buttons, self.view_sub_buttons, self.olcum_sub_buttons]:
+                for btn in btn_list:
+                    btn.setStyleSheet(dark_sub_btn_style)
+                    btn.setFixedHeight(32)
                     btn.setFont(QFont(btn.font().family(), 13))
-            # Dönüştürme alt butonları için özel stil
-            dark_convert_sub_btn_style = """
-                QPushButton {
-                    background-color: #353b4a;
-                    color: #fff;
-                    border: none;
-                    border-radius: 8px;
-                    padding: 6px 0 6px 32px;
-                    font-size: 13px;
-                    margin-left: 0px;
-                    text-align: left;
-                }
-                QPushButton:hover {
-                    background-color: #444a5a;
-                    color: #fff;
-                }
-            """
-            for btn in getattr(self, 'convert_sub_buttons', []):
-                btn.setStyleSheet(dark_convert_sub_btn_style)
-                btn.setFixedHeight(32) # Sabit yükseklik
-                btn.setFont(QFont(btn.font().family(), 13))
 
         def toggle_theme():
             if self.is_light_theme:
@@ -1338,8 +1318,8 @@ class MainWindow(QWidget):
                 self.section_btn.setStyleSheet(light_btn_style)
             if hasattr(self, 'save_section_btn'):
                 self.save_section_btn.setStyleSheet(light_btn_style)
-            # Ölçüm alt butonları için özel stil
-            light_olcum_sub_btn_style = """
+            # Alt menü butonları için açık tema stili
+            light_sub_btn_style = """
                 QPushButton {
                     background-color: #e0e0e0; /* Light theme background */
                     color: #232836; /* Dark text for light theme */
@@ -1355,31 +1335,10 @@ class MainWindow(QWidget):
                     color: #232836; /* Hover text color */
                 }
             """
-            if hasattr(self, 'kenar_olc_btn'):
-                self.kenar_olc_btn.setStyleSheet(light_olcum_sub_btn_style)
-            if hasattr(self, 'vertex_olc_btn'):
-                self.vertex_olc_btn.setStyleSheet(light_olcum_sub_btn_style)
-            if hasattr(self, 'alan_olc_btn'):
-                self.alan_olc_btn.setStyleSheet(light_olcum_sub_btn_style)
-            # Dönüştürme alt butonları için özel stil
-            light_convert_sub_btn_style = """
-                QPushButton {
-                    background-color: #e0e0e0; /* Light theme background */
-                    color: #232836; /* Dark text for light theme */
-                    border: none;
-                    border-radius: 8px;
-                    padding: 6px 0 6px 32px; /* Smaller padding */
-                    font-size: 13px; /* Smaller font size */
-                    margin-left: 0px;
-                    text-align: left;
-                }
-                QPushButton:hover {
-                    background-color: #FFD600; /* Hover color */
-                    color: #232836; /* Hover text color */
-                }
-            """
-            for btn in getattr(self, 'convert_sub_buttons', []):
-                btn.setStyleSheet(light_convert_sub_btn_style)
+            # Tüm alt menü butonlarına stili uygula
+            for btn_list in [self.convert_sub_buttons, self.view_sub_buttons, self.olcum_sub_buttons]:
+                for btn in btn_list:
+                    btn.setStyleSheet(light_sub_btn_style)
             # Sol paneldeki başlık ve label'lar
             for lbl in getattr(self, 'left_panel_labels', []):
                 if lbl.text() == "BOXR CAD":

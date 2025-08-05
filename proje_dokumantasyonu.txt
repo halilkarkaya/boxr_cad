@@ -1,0 +1,65 @@
+### Proje Fonksiyonları Dokümantasyonu
+
+Bu doküman, **BOXR_CAD** projesinin kod yapısını ve içerdiği fonksiyonları, kodlama bilgisi olmayan bir kullanıcının anlayabileceği şekilde detaylı olarak açıklamaktadır.
+
+---
+
+### 1. `main.py`
+
+Bu dosya, uygulamanın başlangıç noktasıdır. Programın çalışmasını sağlayan ana dosyadır.
+
+-   **`main()`**: Bu ana fonksiyondur. Uygulamayı başlatır, `arayuz_design.py` dosyasında tanımlanan ana pencereyi oluşturur ve ekranda gösterir.
+
+---
+
+### 2. `arayuz_design.py`
+
+Bu dosya, uygulamanın görsel arayüzünü oluşturur. Butonlar, paneller ve diğer görsel elemanlar burada tanımlanır.
+
+-   **`MainWindow` Sınıfı**: Uygulamanın ana penceresini temsil eder.
+    -   **`__init__()`**: Pencere ilk açıldığında çalışan fonksiyondur. Pencere başlığını ("BOXR_CAD"), başlangıç boyutunu ve arka plan rengini ayarlar. Ayrıca, dosya sürükle-bırak özelliğini aktif hale getirir.
+    -   **`initUI()`**: Uygulamanın ana arayüzünü (sol, orta ve sağ paneller) oluşturur ve yerleştirir.
+    -   **`create_left_panel()`**: Sol tarafta yer alan ve uygulamanın ana menüsünü oluşturan paneli hazırlar. Bu panelde "Katman Ekle", "Dosya Dönüştür", "Görünüm Seçenekleri", "Ölçüm Yap" gibi ana butonlar ve bunların alt menüleri bulunur.
+    -   **`create_center_panel()`**: Uygulamanın ortasında yer alan ve 3D modelin görüntülendiği ana alanı oluşturur. Bu panel, `cad_viewer.py` dosyasında tanımlanan `OCCModelWidget`'ı içerir.
+    -   **`create_right_panel()`**: Sağ tarafta yer alan ve model bilgileri, katman listesi, renk ayarları gibi detayların gösterildiği paneli oluşturur.
+
+---
+
+### 3. `cad_viewer.py`
+
+Bu dosya, 3D modellerin görüntülenmesi, yönetilmesi ve üzerinde işlem yapılmasıyla ilgili tüm teknik işlemleri içerir.
+
+-   **`OCCModelWidget` Sınıfı**: 3D görüntüleyiciyi temsil eden ana sınıftır.
+    -   **`dragEnterEvent()`** ve **`dropEvent()`**: Kullanıcının bilgisayarından bir 3D model dosyasını sürükleyip doğrudan uygulama penceresine bırakarak açmasını sağlar.
+    -   **`katman_ekle_dosya_yolu()`**: Bir 3D model dosyasını uygulamaya yeni bir katman olarak ekler. Bu işlem sırasında bir ilerleme çubuğu gösterir, modeli yükler ve katman listesini günceller.
+    -   **`toggle_sub_menu()`**: Alt menülerin (örneğin, "Dosya Dönüştür" menüsü) açılıp kapanmasını sağlar.
+    -   **`setup_measurement()`**: "Ölçüm Yap" menüsünden bir seçenek (kenar, köşe, alan) seçildiğinde, 3D görüntüleyiciyi ölçüm yapmaya hazırlar.
+    -   **`toggle_section_ui()`**, **`update_section()`** ve **`save_section()`**: Bu fonksiyonlar, kesit alma özelliğini yönetir. `toggle_section_ui` ile kesit alma paneli açılır/kapanır. `update_section` ile kesit düzleminin konumu ayarlanır. `save_section` ile de oluşturulan kesit, yeni bir 3D model dosyası olarak kaydedilir.
+    -   **`select_printer_path()`** ve **`send_to_printer()`**: 3D yazıcı entegrasyonunu yönetir. `select_printer_path` ile yazıcı yazılımının konumu seçilir. `send_to_printer` ile de seçili model, 3D yazıcı yazılımında açılmak üzere gönderilir.
+    -   **`show_logs()`**, **`hide_log_download_button()`** ve **`download_logs()`**: Uygulamanın çalışma kayıtlarını (logları) yönetir. `show_logs` ile loglar sağ panelde gösterilir, `download_logs` ile de bu kayıtlar bir dosyaya indirilir.
+    -   **`show_ar_preview()`**: Seçilen bir 3D modelin artırılmış gerçeklikte (AR) görüntülenebilmesi için bir QR kod oluşturur ve gösterir.
+    -   **`mesafe_olc()`** ve **`mesafe_sonuc_goster()`**: İki nokta arası mesafe ölçümünü yönetir. `mesafe_olc` ile ölçüm başlatılır, `mesafe_sonuc_goster` ile de sonuç ekranda gösterilir.
+    -   **`show_about_dialog()`** ve **`show_help_dialog()`**: Sırasıyla "Hakkında" ve "Yardım" pencerelerini gösterir.
+    -   **`show_model_info_in_panel()`** ve **`show_shape_info_in_panel()`**: Seçili modelin veya bir parçasının (kenar, yüzey vb.) detaylı bilgilerini sağ panelde gösterir.
+    -   **`set_model_visible()`**, **`set_model_color()`**, **`rotate_model()`**, **`move_model()`**, **`apply_scale_to_model()`**: Modelin görünürlüğünü, rengini, dönüşünü, konumunu ve boyutunu değiştiren fonksiyonlardır.
+    -   **`set_view_mode()`**: Modelin görünümünü "Katı Model" veya "Tel Kafes" olarak değiştirir.
+
+---
+
+### 4. `converter.py`
+
+Bu dosya, 3D model dosyalarını farklı formatlara dönüştürmek için kullanılan fonksiyonları içerir.
+
+-   **`dosya_secici_ac()`**: Kullanıcının bir dosya seçmesi için bir pencere açar.
+-   **`obj_to_stl()`**, **`obj_to_glb()`**, **`stl_to_obj()`**, **`obj_to_fbx()`**: Bu fonksiyonlar, dosyaları bir formattan diğerine dönüştüren temel teknik fonksiyonlardır.
+-   **`convert_to_...()`**: Bu fonksiyonlar, arayüzdeki "Dosya Dönüştür" menüsündeki butonlara bağlıdır. Kullanıcıdan bir dosya seçmesini ister, dönüştürülecek formatı belirler ve dönüştürme işlemini başlatır. İşlem tamamlandığında kullanıcıya bir başarı veya hata mesajı gösterir.
+
+---
+
+### 5. `ar_server.py`
+
+Bu dosya, bir 3D modeli artırılmış gerçeklikte (AR) görüntülemek için bir web sunucusu başlatır.
+
+-   **`get_local_ip()`**: Bilgisayarın yerel ağdaki IP adresini alır. Bu, telefonun bilgisayara bağlanabilmesi için gereklidir.
+-   **`QRCodeDialog` Sınıfı**: AR modelini görüntülemek için bir QR kodu gösteren bir pencere oluşturur.
+-   **Ana Kod Bloğu**: Bu dosya çalıştırıldığında, bilgisayarda geçici bir web sunucusu başlatır, seçilen 3D model için özel bir web adresi oluşturur, bu adres için bir QR kod üretir ve bu QR kodu ekranda gösterir. Kullanıcı bu QR kodu telefonuyla okuttuğunda, modeli kendi ortamında artırılmış gerçeklik olarak görebilir.

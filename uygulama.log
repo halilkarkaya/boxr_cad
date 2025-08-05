@@ -1845,3 +1845,9 @@ TypeError: Wrong number or type of arguments for overloaded function 'gp_Pnt_Tra
 2025-08-01 16:35:17,247 - INFO - backend loaded: pyqt5
 2025-08-01 16:35:17,899 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
 2025-08-01 16:35:17,900 - INFO - Uygulama başlatıldı.
+2025-08-05 14:12:52,794 - INFO - backend loaded: pyqt5
+2025-08-05 14:12:58,355 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-05 14:12:58,360 - INFO - Uygulama başlatıldı.
+2025-08-05 14:31:20,150 - INFO - backend loaded: pyqt5
+2025-08-05 14:31:21,817 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-05 14:31:21,817 - INFO - Uygulama başlatıldı.

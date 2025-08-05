@@ -1,0 +1,130 @@
+### `arayuz_design.py` Fonksiyonları Dokümantasyonu
+
+Bu doküman, **BOXR_CAD** projesinin `arayuz_design.py` dosyasının kod yapısını ve içerdiği fonksiyonları, kodlama bilgisi olmayan bir kullanıcının anlayabileceği şekilde detaylı olarak açıklamaktadır.
+
+---
+
+### 1. Genel Bakış
+
+`arayuz_design.py` dosyası, uygulamanın görsel arayüzünü oluşturan ve kullanıcı etkileşimlerini yöneten ana dosyadır. Pencere, paneller, butonlar, menüler ve diğer tüm görsel elemanlar bu dosyada tanımlanır ve mantığı burada işlenir.
+
+---
+
+### 2. `MainWindow` Sınıfı
+
+Uygulamanın ana penceresini temsil eden ve tüm arayüz elemanlarını içinde barındıran ana sınıftır.
+
+#### 2.1. Ana Fonksiyonlar
+
+-   **`__init__()` (Kurucu Fonksiyon)**:
+    -   Uygulama penceresi ilk oluşturulduğunda çalışır.
+    -   Pencerenin başlığını "BOXR_CAD" olarak ayarlar.
+    -   Pencerenin minimum boyutlarını (1600x900 piksel) belirler.
+    -   Uygulamanın başlangıçtaki koyu tema rengini (`#181c24`) ayarlar.
+    -   Kullanıcının dosyaları sürükleyip bırakarak açabilmesi için "Sürükle-Bırak" özelliğini etkinleştirir.
+    -   `initUI()` fonksiyonunu çağırarak arayüzü başlatır.
+
+-   **`initUI()` (Arayüzü Başlat)**:
+    -   Uygulamanın 3 ana panelden (sol, orta, sağ) oluşan yapısını oluşturur.
+    -   `QSplitter` kullanarak bu panellerin boyutlarının kullanıcı tarafından değiştirilebilmesini sağlar.
+    -   `create_left_panel`, `create_center_panel`, ve `create_right_panel` fonksiyonlarını çağırarak panelleri oluşturur ve pencereye yerleştirir.
+
+#### 2.2. Panel Oluşturma Fonksiyonları
+
+-   **`create_left_panel()` (Sol Paneli Oluştur)**:
+    -   Uygulamanın sol tarafında yer alan menü panelini oluşturur.
+    -   "BOXR CAD" başlığını ve "Dosya İşlemleri" gibi etiketleri ekler.
+    -   Aşağıdaki ana butonları ve bu butonlara tıklandığında açılan alt menüleri oluşturur:
+        -   **➕ Katman Ekle**: Yeni bir 3D model dosyası açmak için kullanılır.
+        -   **🔄 Dosya Dönüştür**: 3D modelleri farklı formatlara (GLB, FBX, OBJ, STEP vb.) dönüştürmek için alt seçenekler sunar.
+        -   **🎨 Görünüm Seçenekleri**: Modelin görünümünü "Katı Model" ve "Tel Kafes" olarak değiştirme seçenekleri sunar.
+        -   **👁️‍🗨️ Model Bilgileri**: Seçili modelin detaylı bilgilerini sağ panelde gösterir.
+        -   **📏 Ölçüm Yap**: Model üzerinde Kenar, Vertex (Nokta) veya Alan ölçümü yapmak için alt seçenekler sunar.
+        -   **✂️ Kesit Düzlemi**: Modelin iç yapısını görmek için kesit alma aracını açar/kapatır.
+        -   **📱 AR'da Görüntüle**: Modeli artırılmış gerçeklikte (AR) görüntülemek için bir QR kod oluşturur.
+        -   **🖨️ 3D Yazıcı**: Modeli 3D yazıcıya gönderme ve yazıcı ayarlarını yapma seçenekleri sunar.
+        -   **📝 Loglar**: Uygulamanın çalışma kayıtlarını (logları) gösterir.
+        -   **💡 Yardım / SSS**: Kullanım kılavuzunu gösterir.
+        -   **❔ Hakkında**: Uygulama hakkındaki bilgileri gösterir.
+
+-   **`create_center_panel()` (Orta Paneli Oluştur)**:
+    -   Uygulamanın merkezinde yer alan ve 3D modelin görüntülendiği ana alanı oluşturur.
+    -   `cad_viewer.py` dosyasında tanımlanan `OCCModelWidget` isimli 3D görüntüleyici bileşenini bu panele yerleştirir.
+    -   Dosya yüklenirken ilerlemeyi gösteren bir "Progress Bar" (İlerleme Çubuğu) içerir.
+    -   Uygulama ilk açıldığında varsayılan olarak `digiMODE.obj` modelini yükler.
+
+-   **`create_right_panel()` (Sağ Paneli Oluştur)**:
+    -   Uygulamanın sağ tarafında yer alan bilgi ve kontrol panelini oluşturur.
+    -   Bu panel iki ana bölümden oluşur:
+        -   **Üst Bölüm**: Logo ve seçilen işleme göre dinamik olarak değişen bir içerik alanı (örneğin, model bilgileri, ölçüm sonuçları, yardım metni burada gösterilir).
+        -   **Alt Bölüm**:
+            -   **🎨 Renk Seç**: Seçili katmanın rengini değiştirir.
+            -   **🖼️ Arka Plan Rengi**: 3D sahnenin arka plan rengini değiştirir.
+            -   **🎯 Ortala**: Kamerayı sahnedeki tüm modellere sığacak şekilde ayarlar.
+            -   **🗑️ Seçili Katmanı Sil**: Listeden seçilen katmanı siler.
+            -   **Katman Hareket Butonları (↑,↓,←,→, X↻, Y↻, Z↻)**: Seçili katmanı hareket ettirir ve döndürür.
+            -   **Katman Listesi**: Sahnedeki tüm katmanları (modelleri) listeler, görünürlüğünü açıp kapatmaya yarayan onay kutuları içerir.
+            -   **🌞 Açık Tema / 🌙 Koyu Tema**: Uygulamanın görsel temasını açık ve koyu mod arasında değiştirir.
+
+#### 2.3. Olay (Event) Yönetimi Fonksiyonları
+
+-   **`dragEnterEvent()` ve `dropEvent()`**:
+    -   Kullanıcının bir dosyayı sürükleyip uygulama penceresine getirdiğinde farenin imlecini değiştirir (`dragEnterEvent`).
+    -   Dosya bırakıldığında, dosyanın uzantısını kontrol eder ve desteklenen bir format ise (`.obj`, `.stl`, `.step` vb.) `katman_ekle_dosya_yolu` fonksiyonunu çağırarak modeli yükler (`dropEvent`).
+
+#### 2.4. Katman ve Model İşlem Fonksiyonları
+
+-   **`katman_ekle_dosya_yolu(dosya_yolu)`**:
+    -   Verilen dosya yolundaki 3D modeli yeni bir katman olarak uygulamaya ekler.
+    -   İlerleme çubuğunu gösterir ve animasyonlu bir şekilde ilerletir.
+    -   Dosya uzantısına göre modeli `cad_viewer` yardımıyla yükler.
+    -   Yeni bir katman oluşturur, bu katmanı hem dahili katman listesine hem de arayüzdeki katman listesine ekler.
+    -   İşlem sonunda ilerleme çubuğunu gizler ve model bilgilerini sağ panelde gösterir.
+
+-   **`secili_katmani_sil()`**:
+    -   Kullanıcının sağ paneldeki katman listesinden seçtiği katmanı siler.
+    -   Modeli 3D sahneden ve katman listesinden kaldırır.
+
+-   **`move_selected_layer()` ve `rotate_selected_layer()`**:
+    -   Sağ paneldeki ok ve döndürme butonlarına basıldığında çalışır.
+    -   Seçili olan katmanı ilgili yönde hareket ettirir veya döndürür.
+
+#### 2.5. Araçlar ve Özellikler Fonksiyonları
+
+-   **`toggle_sub_menu(sub_buttons)`**:
+    -   Sol paneldeki ana butonlara (örn: "Dosya Dönüştür") tıklandığında, ilgili alt menülerin (örn: "GLB'ye Dönüştür", "FBX'e Dönüştür") görünürlüğünü açıp kapatır.
+
+-   **`setup_measurement(measure_type, selection_mode)`**:
+    -   "Ölçüm Yap" menüsünden bir seçenek (Kenar, Vertex, Alan) seçildiğinde tetiklenir.
+    -   3D görüntüleyiciyi (`occ_widget`) seçilen ölçüm moduna geçirir ve kullanıcıya ne yapması gerektiğini (örneğin, "Lütfen bir kenar seçin") sağ panelde bildirir.
+
+-   **`toggle_section_ui()`, `update_section()`, `save_section()`**:
+    -   Bu üç fonksiyon, "Kesit Düzlemi" aracını yönetir.
+    -   `toggle_section_ui`: Kesit kontrol panelini (eksen seçimi, konum kaydırıcısı) gösterir veya gizler.
+    -   `update_section`: Kullanıcı ekseni veya konumu değiştirdiğinde 3D sahnedeki kesit düzlemini günceller.
+    -   `save_section`: Mevcut kesiti alır, bu kesitten yeni bir 3D model (STL formatında) oluşturur, kullanıcıya nereye kaydedeceğini sorar ve ardından bu yeni kesit modelini sahneye yeni bir katman olarak ekler.
+
+-   **`show_ar_preview()`**:
+    -   Kullanıcıdan artırılmış gerçeklikte (AR) göstermek için bir `.glb` veya `.gltf` dosyası seçmesini ister.
+    -   `ar_server.py` betiğini arka planda çalıştırarak bir web sunucusu başlatır.
+    -   Bu sunucu, modeli telefonda görüntülemek için bir QR kodu oluşturur ve yeni bir pencerede gösterir.
+
+-   **`send_to_printer()` ve `select_printer_path()`**:
+    -   Kullanıcının 3D modelini doğrudan bir 3D yazıcı dilimleme yazılımında (slicer) açmasını sağlar.
+    -   `select_printer_path`: Kullanıcıdan ilk seferde yazıcı yazılımının `.exe` dosyasını seçmesini ister ve bu bilgiyi kaydeder.
+    -   `send_to_printer`: Seçili modeli geçici bir STL dosyasına dönüştürür ve daha önce kaydedilen yazılım yoluyla bu dosyayı açar.
+
+-   **`show_logs()` ve `download_logs()`**:
+    -   `show_logs`: `uygulama.log` dosyasının son 100 satırını okur ve sağ panelde gösterir. Ayrıca tüm log dosyasını indirmek için bir buton gösterir.
+    -   `download_logs`: Tüm log dosyasını kullanıcının istediği bir yere kaydetmesini sağlar.
+
+-   **`show_about_dialog()` ve `show_help_dialog()`**:
+    -   Sırasıyla, uygulama sürümü, teknolojileri ve geliştiricisi hakkındaki bilgileri veya uygulamanın nasıl kullanılacağını açıklayan detaylı bir yardım metnini sağ panelde gösterir.
+
+-   **`convert_to_...()` Fonksiyonları (Örn: `convert_to_glb`)**:
+    -   Sol paneldeki "Dosya Dönüştür" alt menüsündeki her bir butona bağlıdırlar.
+    -   `converter.py` dosyasındaki ilgili dönüştürme fonksiyonunu çağırır, kullanıcıdan kaynak dosyayı ve hedef konumu seçmesini ister ve işlemi gerçekleştirir.
+
+-   **`toggle_theme()`**:
+    -   Uygulamanın tüm arayüz elemanlarının (pencereler, butonlar, yazılar, listeler) renklerini açık ve koyu tema arasında değiştiren fonksiyonları çağırır.
+    -   Ayrıca 3D sahnenin arka plan rengini de temaya uygun olarak ayarlar.
