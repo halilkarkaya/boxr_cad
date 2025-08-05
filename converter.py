@@ -1,10 +1,70 @@
 ## \file converter.py
-## \brief 3D model dosya formatları arasında dönüşüm fonksiyonları (OBJ, STL, GLB)
+## \brief 3D model dosya formatları arasinda dönüsüm fonksiyonlari (OBJ, STL, GLB)
 import trimesh
 import os
 import subprocess
 import tempfile
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
+import json
+
+CONFIG_FILE = os.path.expanduser("~/.boxr_cad_config.json")
+
+def save_blender_path(path):
+    """Blender yolunu JSON yapilandirma dosyasına kaydeder."""
+    with open(CONFIG_FILE, "w") as f:
+        json.dump({"blender_path": path}, f)
+
+def load_blender_path():
+    """Kaydedilmis Blender yolunu JSON yapilandirma dosyasindan yükler."""
+    if not os.path.exists(CONFIG_FILE):
+        return None
+    try:
+        with open(CONFIG_FILE, "r") as f:
+            config = json.load(f)
+            return config.get("blender_path")
+    except (json.JSONDecodeError, IOError):
+        return None
+
+def find_blender_executable():
+    """Sistemde Blender'ı otomatik olarak bulmaya çalişir."""
+    # 1. Kayitli yolu kontrol et
+    saved_path = load_blender_path()
+    if saved_path and os.path.exists(saved_path):
+        return saved_path
+
+    # 2. Yaygin kurulum dizinlerini kontrol et (Windows için)
+    possible_paths = []
+    program_files = os.environ.get("ProgramFiles", "C:\\Program Files")
+    blender_foundation_path = os.path.join(program_files, "Blender Foundation")
+    if os.path.exists(blender_foundation_path):
+        for version_dir in os.listdir(blender_foundation_path):
+            blender_exe = os.path.join(blender_foundation_path, version_dir, "blender.exe")
+            if os.path.exists(blender_exe):
+                possible_paths.append(blender_exe)
+
+    for path in possible_paths:
+        if os.path.exists(path):
+            save_blender_path(path)
+            return path
+
+    # 3. PATH ortam değişkenini kontrol et
+    try:
+        blender_path = subprocess.check_output(["where", "blender"]).strip().decode()
+        if os.path.exists(blender_path):
+            save_blender_path(blender_path)
+            return blender_path
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pass
+
+    # 4. Kullaniciya sor
+    QMessageBox.information(None, "Blender Bulunamadi", "FBX dönüsümü için Blender programına ihtiyaç var. Lütfen blender.exe dosyasını seçin.")
+    user_path, _ = QFileDialog.getOpenFileName(None, "Blender Uygulamasını Seç", "", "Uygulama (*.exe)")
+    if user_path and os.path.exists(user_path):
+        save_blender_path(user_path)
+        return user_path
+
+    return None
+
 
 ## \fn dosya_secici_ac(parent=None)
 #  \brief Kullanıcının bir 3D model dosyası seçmesi için bir dosya iletişim kutusu açar.
@@ -59,7 +119,7 @@ def stl_to_obj(stl_path):
 #  \param fbx_path Hedef FBX dosyasının yolu (str).
 #  \param blender_path Blender yürütülebilir dosyasının yolu (str).
 #  \return Başarılı olursa FBX dosyasının yolu (str), aksi takdirde None.
-def obj_to_fbx(obj_path, fbx_path, blender_path=r"D:\\blender\\blender-launcher.exe"):
+def obj_to_fbx(obj_path, fbx_path, blender_path):
     temp_dir = tempfile.gettempdir()
     temp_stl = os.path.join(temp_dir, "temp_obj2fbx.stl")
     temp_glb = os.path.join(temp_dir, "temp_obj2fbx.glb")
@@ -137,7 +197,11 @@ def convert_to_fbx(self):
     if not save_path: return
 
     try:
-        blender_path = r'D:\\blender\\blender-launcher.exe'
+        blender_path = find_blender_executable()
+        if not blender_path:
+            QMessageBox.critical(self, "Hata", "Blender yürütülebilir dosyası bulunamadı. Dönüştürme iptal edildi.")
+            return
+
         result = obj_to_fbx(source_path, save_path, blender_path)
         if result:
             QMessageBox.information(self, "Başarılı", f"Dosya FBX formatına dönüştürüldü:\n{save_path}")
