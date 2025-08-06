@@ -238,8 +238,9 @@ class MainWindow(QWidget):
 
         self.view_sub_buttons = []
         view_options = [
-            ("🖼️ Katı Model", lambda: self.occ_widget.set_view_mode('shaded')),
-            ("📉 Tel Kafes", lambda: self.occ_widget.set_view_mode('wireframe'))
+            ("🧊 Katı Model", lambda: self.occ_widget.set_view_mode('shaded')),
+            ("🕸️ Tel Kafes", lambda: self.occ_widget.set_view_mode('wireframe')),
+            ("💧 Saydamlık", self.toggle_transparency_slider)
         ]
         for text, func in view_options:
             sub_btn = QPushButton(text)
@@ -250,6 +251,15 @@ class MainWindow(QWidget):
             sub_btn.clicked.connect(func)
             vbox.addWidget(sub_btn)
             self.view_sub_buttons.append(sub_btn)
+
+        self.transparency_slider = QSlider(Qt.Horizontal)
+        self.transparency_slider.setMinimum(0)
+        self.transparency_slider.setMaximum(100)
+        self.transparency_slider.setValue(0)
+        self.transparency_slider.setVisible(False)
+        self.transparency_slider.setStyleSheet(sub_btn_style)
+        self.transparency_slider.valueChanged.connect(self.set_transparency)
+        vbox.addWidget(self.transparency_slider)
 
         # 4. Model Bilgileri
         model_info_btn = QPushButton("👁️‍🗨️ Model Bilgileri")
@@ -457,6 +467,19 @@ class MainWindow(QWidget):
         visible = not sub_buttons[0].isVisible()
         for btn in sub_buttons:
             btn.setVisible(visible)
+
+    def toggle_transparency_slider(self):
+        self.transparency_slider.setVisible(not self.transparency_slider.isVisible())
+
+    def set_transparency(self, value):
+        selected_idx = self.layer_list.currentRow()
+        if selected_idx < 0:
+            return
+
+        layer = self.layers[selected_idx]
+        transparency_value = value / 100.0
+        for model_ref in layer["model_refs"]:
+            self.occ_widget.set_model_transparency(model_ref, transparency_value)
 
     def setup_measurement(self, measure_type, selection_mode):
         idx = self.layer_list.currentRow()

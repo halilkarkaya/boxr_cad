@@ -628,6 +628,14 @@ class OCCModelWidget(QWidget):
         self.display.Context.UpdateCurrentViewer()
         self.display.Repaint()
 
+    def set_model_transparency(self, model_ref, transparency):
+        if hasattr(model_ref, 'SetTransparency'):
+            model_ref.SetTransparency(transparency)
+        elif hasattr(model_ref, 'Attributes'):
+            model_ref.Attributes().SetTransparency(transparency)
+        self.display.Context.UpdateCurrentViewer()
+        self.display.Repaint()
+
     def set_measure_mode(self, enabled=True):
         self.measure_mode = enabled
         # Temizlik: Ölçüm modu kapatılırken veya başlatılırken geçici küreleri ve seçili noktaları temizle

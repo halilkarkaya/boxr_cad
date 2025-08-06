@@ -22,6 +22,27 @@ logging.basicConfig(
 if __name__ == "__main__":
     logging.info("Uygulama başlatıldı.")
     app = QApplication(sys.argv)  # \brief Uygulama nesnesini oluşturur
+
+    # Koyu tema için global QMessageBox stili
+    app.setStyleSheet("""
+        QMessageBox {
+            background-color: #2b2b2b;
+        }
+        QMessageBox QLabel {
+            color: #ffffff;
+        }
+        QMessageBox QPushButton {
+            background-color: #3c3c3c;
+            color: #ffffff;
+            border: 1px solid #555555;
+            padding: 5px;
+            min-width: 70px;
+        }
+        QMessageBox QPushButton:hover {
+            background-color: #4d4d4d;
+        }
+    """)
+
     win = MainWindow()            # \brief Ana pencereyi oluşturur
     win.show()                    # \brief Ana pencereyi gösterir
     win.occ_widget.updateGeometry()  # \brief OCC widget'ının geometrisini günceller
