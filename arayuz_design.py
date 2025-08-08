@@ -78,6 +78,7 @@ class MainWindow(QWidget):
     def katman_ekle_dosya_yolu(self, dosya_yolu):
         # Dosya yolu ile katman ekle
         import logging
+        import logging
         from PyQt5.QtCore import QTimer
         if not dosya_yolu:
             return 
@@ -1053,6 +1054,7 @@ class MainWindow(QWidget):
             for ref in self.layers[idx]["model_refs"]:
                 self.occ_widget.set_model_visible(ref, visible)
         self.layer_list.itemChanged.connect(on_layer_check)
+        self.layer_list.currentItemChanged.connect(self.show_model_info_in_panel)  # Bu satırı ekle
         # Katmanlar kutusunda sağ tık menüsü ile katman silme
         self.layer_list.setContextMenuPolicy(Qt.CustomContextMenu)
         def katman_context_menu(point):
@@ -1494,47 +1496,269 @@ class MainWindow(QWidget):
         """
         self.right_content_label.setText(html)
 
+    def show_comparison_results(self, result_data):
+        if not result_data:
+            return
+
+        html = self.right_content_label.text()  # Mevcut içeriği al
+        html += "<hr style='border-color: #353b4a; margin-top: 10px; margin-bottom: 10px;'>"
+
+        if result_data.get("comparison_unavailable"):
+            html += f"<div style='font-size:15px; color:#FFD600;'><b>{result_data.get('conversion_type', '')} Karşılaştırması:</b></div>"
+            html += "<div style='font-size:14px; color:#bfc7e6;'>Bu format için karşılaştırma yapılamıyor.</div>"
+            self.right_content_label.setText(html)
+            return
+
+        original = result_data.get("original")
+        new = result_data.get("new")
+        conv_type = result_data.get("conversion_type", "N/A")
+
+        html += f"<div style='font-size:15px; color:#FFD600;'><b>Dönüşüm Karşılaştırması ({conv_type}):</b></div>"
+        html += "<table style='width:100%; color:#bfc7e6; font-size:14px;'>"
+        html += "<tr><th>Özellik</th><th>Orijinal</th><th>Yeni</th><th>Değişim (%)</th></tr>"
+
+        # Hacim Karşılaştırması
+        if original and new and original.get("volume") is not None and new.get("volume") is not None:
+            vol_orig = original["volume"]
+            vol_new = new["volume"]
+            vol_loss = ((vol_new - vol_orig) / vol_orig * 100) if vol_orig != 0 else 0
+            html += f"<tr><td>Hacim (mm³)</td><td>{vol_orig:.2f}</td><td>{vol_new:.2f}</td><td style='color: {'red' if vol_loss < -0.01 else 'green'};'>{vol_loss:.2f}%</td></tr>"
+        else:
+            html += f"<tr><td>Hacim (mm³)</td><td>N/A</td><td>{new.get('volume', 'N/A'):.2f}</td><td>N/A</td></tr>"
+
+        # Yüzey Alanı Karşılaştırması
+        if original and new and original.get("area") is not None and new.get("area") is not None:
+            area_orig = original["area"]
+            area_new = new["area"]
+            area_loss = ((area_new - area_orig) / area_orig * 100) if area_orig != 0 else 0
+            html += f"<tr><td>Yüzey Alanı (mm²)</td><td>{area_orig:.2f}</td><td>{area_new:.2f}</td><td style='color: {'red' if area_loss < -0.01 else 'green'};'>{area_loss:.2f}%</td></tr>"
+        else:
+            html += f"<tr><td>Yüzey Alanı (mm²)</td><td>N/A</td><td>{new.get('area', 'N/A'):.2f}</td><td>N/A</td></tr>"
+        
+        html += "</table>"
+        self.right_content_label.setText(html)
+
     def convert_to_glb(self):
-        convert_to_glb(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_to_glb(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_to_fbx(self):
-        convert_to_fbx(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_to_fbx(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_to_obj(self):
-        convert_to_obj(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_to_obj(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_to_step(self):
-        convert_to_step(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_to_step(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_to_ply(self):
-        convert_to_ply(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_to_ply(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_to_gltf(self):
-        convert_to_gltf(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_to_gltf(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_to_3mf(self):
-        convert_to_3mf(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_to_3mf(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_to_dae(self):
-        convert_to_dae(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_to_dae(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_step_to_stl(self):
-        convert_step_to_stl(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_step_to_stl(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
     def convert_step_to_obj(self):
-        convert_step_to_obj(self)
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            QMessageBox.warning(self, "Uyarı", "Lütfen dönüştürme işlemi için bir katman seçin.")
+            return
+        source_path = self.layers[idx].get("model_path")
+        if not source_path:
+            QMessageBox.warning(self, "Hata", "Seçili katmana ait bir dosya yolu bulunamadı.")
+            return
+        result = convert_step_to_obj(self, source_path=source_path)
+        if result:
+            self.show_comparison_results(result)
 
-    def show_model_info_in_panel(self):
-        """Sağ panelde mevcut modelin bilgilerini gösterir."""
+    def show_model_info_in_panel(self, current_item=None, previous_item=None):
+        """Sağ panelde seçili katmanın model bilgilerini modern bir kart görünümünde gösterir."""
+        idx = self.layer_list.currentRow()
+        if idx < 0:
+            self.right_content_label.setText("<div style='font-size:15px; color:#bfc7e6; text-align:center; padding-top:20px;'>Model bilgisi için bir katman seçin.</div>")
+            return
+
+        layer = self.layers[idx]
+        model_path = layer.get("model_path")
+
+        if not model_path or not hasattr(self, 'occ_widget'):
+            self.right_content_label.setText("<div style='font-size:15px; color:red; text-align:center; padding-top:20px;'>Seçili katman için model bilgisi alınamadı.</div>")
+            return
+
+        info = self.occ_widget.get_model_info(model_path)
+
         self.right_frame.setVisible(True)
         self.hide_log_download_button()
-        if hasattr(self, 'right_content_label'):
-            info = self.occ_widget.get_model_info()
-            html = "<div style='font-size:15px; color:#bfc7e6;'><b>Model Bilgileri:</b><br>"
-            for k, v in info.items():
-                html += f"<b>{k}:</b> {v}<br>"
-            html += "</div>"
-            self.right_content_label.setText(html)
+        
+        html = """<div style='font-family: "Segoe UI", sans-serif; color: #bfc7e6;'>
+                       <h3 style='color: #FFD600; border-bottom: 1px solid #353b4a; padding-bottom: 5px;'>Model Bilgileri</h3>
+                       <div style='padding: 10px;'>
+                           <p><b>Katman Adı:</b> {layer_name}</p>
+                           <p><b>Dosya Adı:</b> {file_name}</p>
+                           <p><b>Format:</b> {format}</p>
+                           <p><b>Vertex Sayısı:</b> {vertices}</p>
+                           <p><b>Yüzey Sayısı:</b> {faces}</p>
+                           <p><b>Sınır Kutusu (X,Y,Z):</b> {bbox}</p>
+                       </div>
+                   </div>""".format(
+            layer_name=layer.get('name', 'N/A'),
+            file_name=info.get('Dosya Adı', 'N/A'),
+            format=info.get('Format', 'N/A'),
+            vertices=info.get('Vertex Sayısı', 'N/A'),
+            faces=info.get('Yüzey (Face) Sayısı', 'N/A'),
+            bbox=info.get('Sınır Kutusu (X, Y, Z)', 'N/A')
+        )
+        self.right_content_label.setText(html)
+
+    def show_comparison_results(self, result_data):
+        if not result_data:
+            return
+
+        # Mevcut model bilgisi HTML'ini al
+        html = self.right_content_label.text()
+        html += "<br><hr style='border-color: #353b4a;'>"
+
+        conv_type = result_data.get("conversion_type", "N/A")
+        
+        comparison_html = """<div style='font-family: "Segoe UI", sans-serif; color: #bfc7e6; margin-top:10px;'>
+                               <h3 style='color: #2196f3; border-bottom: 1px solid #353b4a; padding-bottom: 5px;'>Dönüşüm Karşılaştırması ({conv_type})</h3>
+                           """.format(conv_type=conv_type)
+
+        if result_data.get("comparison_unavailable"):
+            comparison_html += "<div style='padding: 10px;'><p>Bu format için karşılaştırma verisi mevcut değil.</p></div>"
+        else:
+            original = result_data.get("original")
+            new = result_data.get("new")
+            
+            comparison_html += "<table style='width:100%; border-collapse: collapse; margin-top:10px; font-size:14px;'>"
+            comparison_html += "<tr style='background-color: #353b4a;'><th style='padding: 8px; text-align:left;'>Özellik</th><th style='padding: 8px; text-align:right;'>Orijinal</th><th style='padding: 8px; text-align:right;'>Yeni</th><th style='padding: 8px; text-align:right;'>Değişim</th></tr>"
+
+            # Hacim
+            if original and new and original.get("volume") is not None and new.get("volume") is not None:
+                vol_orig = original["volume"]
+                vol_new = new["volume"]
+                vol_loss = ((vol_new - vol_orig) / vol_orig * 100) if vol_orig != 0 else 0
+                color = '#f44336' if vol_loss < -0.01 else '#4CAF50'
+                comparison_html += f"<tr><td style='padding: 8px;'>Hacim (mm³)</td><td style='padding: 8px; text-align:right;'>{vol_orig:.2f}</td><td style='padding: 8px; text-align:right;'>{vol_new:.2f}</td><td style='padding: 8px; text-align:right; color:{color};'>{vol_loss:+.2f}%</td></tr>"
+            else:
+                vol_new_val = new.get('volume', 'N/A')
+                vol_new_str = f"{vol_new_val:.2f}" if isinstance(vol_new_val, float) else "N/A"
+                comparison_html += f"<tr><td style='padding: 8px;'>Hacim (mm³)</td><td style='padding: 8px; text-align:right;'>N/A</td><td style='padding: 8px; text-align:right;'>{vol_new_str}</td><td style='padding: 8px; text-align:right;'>N/A</td></tr>"
+
+            # Yüzey Alanı
+            if original and new and original.get("area") is not None and new.get("area") is not None:
+                area_orig = original["area"]
+                area_new = new["area"]
+                area_loss = ((area_new - area_orig) / area_orig * 100) if area_orig != 0 else 0
+                color = '#f44336' if area_loss < -0.01 else '#4CAF50'
+                comparison_html += f"<tr style='background-color:#2a2f3a;'><td style='padding: 8px;'>Yüzey Alanı (mm²)</td><td style='padding: 8px; text-align:right;'>{area_orig:.2f}</td><td style='padding: 8px; text-align:right;'>{area_new:.2f}</td><td style='padding: 8px; text-align:right; color:{color};'>{area_loss:+.2f}%</td></tr>"
+            else:
+                area_new_val = new.get('area', 'N/A')
+                area_new_str = f"{area_new_val:.2f}" if isinstance(area_new_val, float) else "N/A"
+                comparison_html += f"<tr style='background-color:#2a2f3a;'><td style='padding: 8px;'>Yüzey Alanı (mm²)</td><td style='padding: 8px; text-align:right;'>N/A</td><td style='padding: 8px; text-align:right;'>{area_new_str}</td><td style='padding: 8px; text-align:right;'>N/A</td></tr>"
+            
+            comparison_html += "</table>"
+
+        comparison_html += "</div>"
+        html += comparison_html
+        self.right_content_label.setText(html)
 
     def show_shape_info_in_panel(self, info, title=None, is_html=False):
         self.hide_log_download_button()

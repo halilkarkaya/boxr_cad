@@ -1,7 +1,7 @@
 ## \file cad_viewer.py
 ## \brief PyQt5 tabanlı 3D CAD model görüntüleyici ve yardımcı fonksiyonlar.
 
-from PyQt5.QtWidgets import QFileDialog, QWidget, QVBoxLayout, QSizePolicy, QFrame, QLabel, QProgressBar, QMessageBox, QHBoxLayout, QPushButton
+from PyQt5.QtWidgets import QFileDialog, QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy, QFrame, QLabel, QProgressBar, QMessageBox
 from PyQt5.QtGui import QPainter, QPen, QColor, QLinearGradient, QBrush
 from PyQt5.QtCore import pyqtSignal
 import trimesh
@@ -562,21 +562,29 @@ class OCCModelWidget(QWidget):
     ## \fn get_model_info(self)
     #  \brief Yüklü modelin temel bilgilerini (vertex, yüzey, boyut, format) döndürür.
     #  \return Model bilgilerini içeren sözlük (dict)
-    def get_model_info(self):
+    def get_model_info(self, model_path=None):
+        """Belirtilen modelin veya son yüklenen modelin bilgilerini döndürür."""
         info = {}
-        if self.model_path and os.path.exists(self.model_path):
-            info['Dosya'] = os.path.basename(self.model_path)
-            info['Yol'] = self.model_path
+        path_to_check = model_path if model_path else self.model_path
+
+        if path_to_check and os.path.exists(path_to_check):
+            info['Dosya Adı'] = os.path.basename(path_to_check)
+            info['Dosya Yolu'] = path_to_check
             try:
-                mesh = trimesh.load(self.model_path, force='mesh')
+                mesh = trimesh.load(path_to_check, force='mesh')
                 info['Vertex Sayısı'] = len(mesh.vertices)
                 info['Yüzey (Face) Sayısı'] = len(mesh.faces)
-                info['Boyutlar'] = mesh.extents.tolist() if hasattr(mesh, 'extents') else '-'
-                info['Format'] = os.path.splitext(self.model_path)[-1].upper()
+                # Bounding box bilgisini daha okunabilir bir formatta ekle
+                if hasattr(mesh, 'extents') and mesh.extents is not None:
+                    dims = [f"{d:.2f}" for d in mesh.extents]
+                    info['Sınır Kutusu (X, Y, Z)'] = f"{dims[0]} x {dims[1]} x {dims[2]}"
+                else:
+                    info['Sınır Kutusu'] = 'Hesaplanamadı'
+                info['Format'] = os.path.splitext(path_to_check)[-1].upper()
             except Exception as e:
-                info['Hata'] = str(e)
+                info['Hata'] = f"Model bilgileri okunurken hata: {e}"
         else:
-            info['Bilgi'] = 'Model yüklenmedi.'
+            info['Bilgi'] = 'Geçerli bir model seçilmedi veya dosya bulunamadı.'
         return info
 
     def add_model(self, stl_path, model_path=None):

@@ -33,7 +33,7 @@ logging.basicConfig(
     encoding='utf-8'
 )
 
-# --- AR Sunucu Fonksiyonları ---
+# --- AR Sunucu Fonksiyonları --- 
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
