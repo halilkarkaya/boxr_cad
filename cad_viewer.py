@@ -7,6 +7,18 @@ from PyQt5.QtCore import pyqtSignal
 import trimesh
 import tempfile
 import os
+import sys
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 from OCC.Display.backend import load_backend
 load_backend("pyqt5")  # OpenCASCADE'nin PyQt5 ile entegrasyonunu sağlar, 3D görüntüleme için gerekli
 from OCC.Display.qtDisplay import qtViewer3d

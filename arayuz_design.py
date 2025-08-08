@@ -5,8 +5,19 @@ import os
 import logging
 import subprocess
 import sys
+import json
 
-log_path = os.path.join(os.path.dirname(__file__), 'uygulama.log')
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+log_path = resource_path('uygulama.log')
 logging.basicConfig(
     filename=log_path,
     level=logging.INFO,
@@ -793,7 +804,7 @@ class MainWindow(QWidget):
             self.progress_bar.setStyleSheet('QProgressBar { background: #232836; color: #FFD600; border-radius: 8px; height: 22px; font-size: 15px; } QProgressBar::chunk { background: #FFD600; border-radius: 8px; }')
             vbox.addWidget(self.progress_bar)
             # Varsayılan olarak digiMODE.obj dosyasını yükle
-            default_obj = os.path.join(os.path.dirname(__file__), 'digiMODE.obj')
+            default_obj = resource_path('digiMODE.obj')
             if os.path.exists(default_obj):
                 stl_path = obj_to_stl(default_obj)
                 model_ref = self.occ_widget.add_model(stl_path, model_path=default_obj)
@@ -841,7 +852,7 @@ class MainWindow(QWidget):
 
         # --- Logo Widget ---
         self.logo_label = QLabel()
-        pixmap = QPixmap(os.path.join(os.path.dirname(__file__), 'digimode.png'))
+        pixmap = QPixmap(resource_path('digimode.png'))
         self.logo_label.setPixmap(pixmap.scaledToWidth(120, Qt.SmoothTransformation))
         self.logo_label.setAlignment(Qt.AlignCenter)
         self.logo_label.setStyleSheet("background: transparent; margin-bottom: 10px;")
@@ -1378,14 +1389,20 @@ class MainWindow(QWidget):
         file_path, _ = QFileDialog.getOpenFileName(self, "AR Önizlemesi için Model Seç", "", "3D Modeller (*.glb *.gltf)")
         if file_path:
             try:
-                # ar_server.py'nin tam yolunu al
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                ar_server_path = os.path.join(script_dir, 'ar_server.py')
+                command = [sys.executable]
+                if not getattr(sys, 'frozen', False):
+                    command.append("main.py")
+
+                command.extend(['--ar-server', file_path])
                 
-                # ar_server.py'yi yeni bir işlem olarak başlat
-                # subprocess.Popen, GUI'yi bloklamadan arka planda çalışmasını sağlar
-                subprocess.Popen([sys.executable, ar_server_path, file_path])
-                QMessageBox.information(self, "AR Sunucusu Başlatıldı", f"'{os.path.basename(file_path)}' modeli için AR sunucusu başlatıldı. Açılan penceredeki QR kodu tarayın.")
+                # Hata ayıklama için log dosyaları oluştur
+                stdout_log = open('ar_server_stdout.log', 'w')
+                stderr_log = open('ar_server_stderr.log', 'w')
+
+                # Arka plan işlemini log dosyalarına yazacak şekilde başlat
+                subprocess.Popen(command, stdout=stdout_log, stderr=stderr_log)
+
+                QMessageBox.information(self, "AR Sunucusu Başlatıldı", "AR sunucusu arka planda başlatıldı. Bir sorun olursa lütfen ar_server_stderr.log dosyasını kontrol edin.")
             except Exception as e:
                 QMessageBox.critical(self, "Hata", f"AR sunucusu başlatılırken bir hata oluştu: {e}")
 

@@ -1869,3 +1869,47 @@ TypeError: Wrong number or type of arguments for overloaded function 'gp_Pnt_Tra
 2025-08-06 21:39:11,414 - INFO - backend loaded: pyqt5
 2025-08-06 21:39:12,193 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
 2025-08-06 21:39:12,194 - INFO - Uygulama başlatıldı.
+2025-08-06 22:08:23,237 - INFO - backend loaded: pyqt5
+2025-08-06 22:08:24,933 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-06 22:08:24,934 - INFO - Uygulama başlatıldı.
+2025-08-06 22:20:16,042 - INFO - backend loaded: pyqt5
+2025-08-06 22:20:16,839 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-06 22:20:16,839 - INFO - Uygulama başlatıldı.
+2025-08-06 22:34:20,167 - INFO - backend loaded: pyqt5
+2025-08-06 22:34:21,025 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-06 22:34:21,026 - INFO - Uygulama başlatıldı.
+2025-08-07 11:26:54,576 - INFO - backend loaded: pyqt5
+2025-08-07 11:27:00,047 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 11:27:00,047 - INFO - Uygulama başlatıldı.
+2025-08-07 13:05:30,695 - INFO - backend loaded: pyqt5
+2025-08-07 13:05:31,592 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 13:05:31,650 - INFO - Ana uygulama başlatıldı.
+2025-08-07 13:06:10,341 - INFO - backend loaded: pyqt5
+2025-08-07 13:06:11,007 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 13:06:11,026 - INFO - Ana uygulama başlatıldı.
+2025-08-07 13:08:52,631 - INFO - backend loaded: pyqt5
+2025-08-07 13:08:53,343 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 13:08:53,362 - INFO - Ana uygulama başlatıldı.
+2025-08-07 13:09:01,892 - INFO - backend loaded: pyqt5
+2025-08-07 13:09:02,676 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 13:09:02,697 - INFO - AR sunucusu başlatılıyor: C:/Users/halil/Desktop/boxr_cad/boxr_cad/digiMODE.glb
+2025-08-07 13:11:01,797 - INFO - backend loaded: pyqt5
+2025-08-07 14:00:58,116 - INFO - backend loaded: pyqt5
+2025-08-07 14:00:59,544 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 14:00:59,570 - INFO - Ana uygulama başlatıldı.
+2025-08-07 14:01:05,599 - INFO - backend loaded: pyqt5
+2025-08-07 14:01:06,323 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 14:01:06,345 - INFO - AR sunucusu başlatılıyor: C:/Users/halil/Desktop/boxr_cad/boxr_cad/digiMODE.glb
+2025-08-07 14:01:06,345 - ERROR - Kritik Hata: viewer.html kopyalanamadı: 'C:\\Users\\halil\\Desktop\\boxr_cad\\boxr_cad\\viewer.html' and 'C:\\Users\\halil\\Desktop\\boxr_cad\\boxr_cad\\viewer.html' are the same file
+2025-08-07 14:04:06,272 - INFO - backend loaded: pyqt5
+2025-08-07 14:04:07,221 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 14:04:07,245 - INFO - Ana uygulama başlatıldı.
+2025-08-07 14:04:12,375 - INFO - backend loaded: pyqt5
+2025-08-07 14:04:13,171 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-07 14:04:13,193 - INFO - AR sunucusu başlatılıyor: C:/Users/halil/Desktop/boxr_cad/boxr_cad/gul2.glb
+2025-08-08 09:50:47,000 - INFO - backend loaded: pyqt5
+2025-08-08 09:50:47,799 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-08 09:50:47,849 - INFO - Ana uygulama başlatıldı.
+2025-08-08 09:56:53,415 - INFO - backend loaded: pyqt5
+2025-08-08 09:56:54,283 - INFO - The pyqt5 backend is already loaded...``load_backend`` can only be called once per session
+2025-08-08 09:56:54,314 - INFO - Ana uygulama başlatıldı.

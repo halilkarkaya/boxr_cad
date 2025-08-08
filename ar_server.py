@@ -14,6 +14,16 @@ from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import Qt
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 ## \fn get_local_ip
 ## \brief Yerel ağdaki IP adresini alır.
 ## \return Yerel IP adresi (str).
@@ -81,8 +91,7 @@ if __name__ == "__main__":
     model_filename = os.path.basename(model_path)
     os.chdir(file_dir)
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    viewer_html_src = os.path.join(script_dir, 'viewer.html')
+    viewer_html_src = resource_path('viewer.html')
     viewer_html_dest = os.path.join(file_dir, 'viewer.html')
     if os.path.exists(viewer_html_src) and not os.path.exists(viewer_html_dest):
         import shutil
