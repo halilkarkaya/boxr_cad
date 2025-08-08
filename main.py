@@ -144,24 +144,7 @@ if __name__ == "__main__":
     else:
         logging.info("Ana uygulama başlatıldı.")
         app = QApplication(sys.argv)
-        app.setStyleSheet("""
-            QMessageBox {
-                background-color: #2b2b2b;
-            }
-            QMessageBox QLabel {
-                color: #ffffff;
-            }
-            QMessageBox QPushButton {
-                background-color: #3c3c3c;
-                color: #ffffff;
-                border: 1px solid #555555;
-                padding: 5px;
-                min-width: 70px;
-            }
-            QMessageBox QPushButton:hover {
-                background-color: #4d4d4d;
-            }
-        """)
+        
         win = MainWindow()
         win.show()
         win.occ_widget.updateGeometry()

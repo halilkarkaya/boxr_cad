@@ -1176,6 +1176,50 @@ class MainWindow(QWidget):
                 self.occ_widget.display.View.SetBackgroundColor(Quantity_Color(r, g, b, Quantity_TOC_RGB))
                 self.occ_widget.display.Repaint()
 
+            # Kesit Kontrol GroupBox ve içindeki elemanlar için açık tema
+            self.section_group_box.setStyleSheet("""
+                QGroupBox {
+                    color: #232836; /* Dark text for light theme */
+                    font-size: 14px;
+                    font-weight: bold;
+                    border: 1px solid #e0e0e0; /* Lighter border */
+                    border-radius: 8px;
+                    margin-top: 10px;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    subcontrol-position: top center;
+                    padding: 0 5px;
+                }
+            """)
+            self.z_radio.setStyleSheet("color: #232836;")
+            self.y_radio.setStyleSheet("color: #232836;")
+            self.x_radio.setStyleSheet("color: #232836;")
+            self.section_label.setStyleSheet("color:#232836; font-size:13px;")
+            self.section_pos_edit.setStyleSheet("color: #232836; background-color: #e0e0e0; border-radius: 4px; padding: 2px;")
+            self.save_section_btn.setStyleSheet(light_btn_style)
+            self.close_section_btn.setStyleSheet(light_btn_style)
+
+            QApplication.instance().setStyleSheet("""
+                QMessageBox {
+                    background-color: #f0f0f0;
+                }
+                QMessageBox QLabel {
+                    color: #000000;
+                }
+                QMessageBox QPushButton {
+                    background-color: #e0e0e0;
+                    color: #000000;
+                    border: 1px solid #cccccc;
+                    padding: 5px;
+                    min-width: 70px;
+                    border-radius: 4px;
+                }
+                QMessageBox QPushButton:hover {
+                    background-color: #d0d0d0;
+                }
+            """)
+
         def apply_dark_theme():
             self.setStyleSheet("background-color: #181c24;")
             if hasattr(self, 'left_frame'):
@@ -1244,6 +1288,50 @@ class MainWindow(QWidget):
                 r, g, b = 24/255.0, 28/255.0, 36/255.0
                 self.occ_widget.display.View.SetBackgroundColor(Quantity_Color(r, g, b, Quantity_TOC_RGB))
                 self.occ_widget.display.Repaint()
+
+            # Kesit Kontrol GroupBox ve içindeki elemanlar için koyu tema
+            self.section_group_box.setStyleSheet("""
+                QGroupBox {
+                    color: #FFD600;
+                    font-size: 14px;
+                    font-weight: bold;
+                    border: 1px solid #353b4a;
+                    border-radius: 8px;
+                    margin-top: 10px;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    subcontrol-position: top center;
+                    padding: 0 5px;
+                }
+            """)
+            self.z_radio.setStyleSheet("color: #fff;")
+            self.y_radio.setStyleSheet("color: #fff;")
+            self.x_radio.setStyleSheet("color: #fff;")
+            self.section_label.setStyleSheet("color:#FFD600; font-size:13px;")
+            self.section_pos_edit.setStyleSheet("color: #fff; background-color: #353b4a; border-radius: 4px; padding: 2px;")
+            self.save_section_btn.setStyleSheet(dark_btn_style)
+            self.close_section_btn.setStyleSheet(dark_btn_style)
+
+            QApplication.instance().setStyleSheet("""
+                QMessageBox {
+                    background-color: #2b2b2b;
+                }
+                QMessageBox QLabel {
+                    color: #ffffff;
+                }
+                QMessageBox QPushButton {
+                    background-color: #3c3c3c;
+                    color: #ffffff;
+                    border: 1px solid #555555;
+                    padding: 5px;
+                    min-width: 70px;
+                    border-radius: 4px;
+                }
+                QMessageBox QPushButton:hover {
+                    background-color: #4d4d4d;
+                }
+            """)
 
         def apply_left_panel_dark_theme():
             if hasattr(self, 'left_frame'):
@@ -1354,6 +1442,37 @@ class MainWindow(QWidget):
                 self.section_btn.setStyleSheet(light_btn_style)
             if hasattr(self, 'save_section_btn'):
                 self.save_section_btn.setStyleSheet(light_btn_style)
+            if hasattr(self, 'close_section_btn'):
+                self.close_section_btn.setStyleSheet(light_btn_style)
+
+            # Kesit Kontrol GroupBox içindeki elemanlar
+            if hasattr(self, 'section_group_box'):
+                self.section_group_box.setStyleSheet("""
+                    QGroupBox {
+                        color: #232836; /* Dark text for light theme */
+                        font-size: 14px;
+                        font-weight: bold;
+                        border: 1px solid #e0e0e0; /* Lighter border */
+                        border-radius: 8px;
+                        margin-top: 10px;
+                    }
+                    QGroupBox::title {
+                        subcontrol-origin: margin;
+                        subcontrol-position: top center;
+                        padding: 0 5px;
+                    }
+                """)
+            if hasattr(self, 'z_radio'):
+                self.z_radio.setStyleSheet("color: #232836;")
+            if hasattr(self, 'y_radio'):
+                self.y_radio.setStyleSheet("color: #232836;")
+            if hasattr(self, 'x_radio'):
+                self.x_radio.setStyleSheet("color: #232836;")
+            if hasattr(self, 'section_label'):
+                self.section_label.setStyleSheet("color:#232836; font-size:13px;")
+            if hasattr(self, 'section_pos_edit'):
+                self.section_pos_edit.setStyleSheet("color: #232836; background-color: #e0e0e0; border-radius: 4px; padding: 2px;")
+
             # Alt menü butonları için açık tema stili
             light_sub_btn_style = """
                 QPushButton {
@@ -1372,7 +1491,7 @@ class MainWindow(QWidget):
                 }
             """
             # Tüm alt menü butonlarına stili uygula
-            for btn_list in [self.convert_sub_buttons, self.view_sub_buttons, self.olcum_sub_buttons]:
+            for btn_list in [self.convert_sub_buttons, self.view_sub_buttons, self.olcum_sub_buttons, self.printer_sub_buttons]:
                 for btn in btn_list:
                     btn.setStyleSheet(light_sub_btn_style)
             # Sol paneldeki başlık ve label'lar
@@ -1711,8 +1830,9 @@ class MainWindow(QWidget):
         if not result_data:
             return
 
-        # Mevcut model bilgisi HTML'ini al
-        html = self.right_content_label.text()
+        self.show_model_info_in_panel() # Önce güncel model bilgisini göster
+        html = self.right_content_label.text() # Sonra mevcut HTMLi al
+
         html += "<br><hr style='border-color: #353b4a;'>"
 
         conv_type = result_data.get("conversion_type", "N/A")
